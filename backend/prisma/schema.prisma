@@ -1,0 +1,607 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model College {
+  id               Int            @id @default(autoincrement())
+  name             String
+  collegeCode      String?         @unique
+  inviteCode       String?         @unique
+  inviteCodeStatus Boolean         @default(true)
+  domain           String?         @unique
+  institutionType  String?         // Engineering, Arts, Medical, Polytechnic, Other
+  universityName   String?
+  isAutonomous     Boolean         @default(false)
+  establishmentYear String?
+  
+  // Location Details
+  country          String?         @default("India")
+  state            String?
+  city             String?
+  address          String?
+  pincode          String?
+  
+  // Contact Details
+  officialEmail    String?
+  officialPhone    String?
+  websiteUrl       String?
+  
+  // Academic Details
+  departments      String?         // Comma-separated list of departments
+  totalDepartments Int?            @default(0)
+  studentCapacity  Int?            @default(0)
+  placementCellAvailable Boolean    @default(true)
+  
+  // Branding Details
+  logo             String?
+  logoPublicId     String?
+  banner           String?
+  bannerPublicId   String?
+  
+  // Status & Limits
+  status           String?         @default("active")
+  studentLimit     Int?            @default(1000)
+  alumniLimit      Int?            @default(1000)
+  
+  createdAt        DateTime       @default(now())
+  users            User[]
+  announcements    Announcement[]
+  departmentsList  Department[]
+  subscription     Subscription?
+  signupCodes      SignupCode[]
+  jobs             Job[]
+  webinars         Webinar[]
+}
+
+model Department {
+  id               Int      @id @default(autoincrement())
+  name             String
+  code             String
+  collegeId        Int
+  college          College  @relation(fields: [collegeId], references: [id])
+  
+  // HOD Details
+  hodName          String?
+  hodEmail         String?
+  phoneNumber      String?
+  
+  // Academic Details
+  studentCapacity  Int      @default(60)
+  
+  // Placement Details
+  placementCoordinatorName  String?
+  placementCoordinatorEmail String?
+  placementCoordinatorPhone String?
+  
+  category         String?  // CSE, IT, ECE, EEE, Mechanical, Civil, MBA
+  status           String   @default("active")
+  
+  createdAt        DateTime @default(now())
+
+  @@unique([collegeId, code])
+}
+
+model User {
+  id               Int            @id @default(autoincrement())
+  name             String
+  email            String         @unique
+  password         String?
+  role             String         // SUPER_ADMIN, COLLEGE_ADMIN, STUDENT, ALUMNI
+  collegeId        Int
+  college          College        @relation(fields: [collegeId], references: [id])
+  isVerified       Boolean        @default(false)
+  
+  // New Verification Fields
+  verificationStatus String       @default("APPROVED") // PENDING_APPROVAL, APPROVED, REJECTED
+  rejectionReason   String?
+  idProofUrl        String?
+  idProofPublicId   String?
+  collegeIdNumber   String?
+  
+  // OAuth Fields
+  googleId           String?        @unique
+  authProvider       String         @default("LOCAL") // LOCAL or GOOGLE
+  lastSocialLogin    DateTime?
+  
+  createdAt        DateTime       @default(now())
+  student          Student?
+  alumni           Alumni?
+  notifications    Notification[]
+  sentMessages     Message[]      @relation("SentMessages")
+  receivedMessages Message[]      @relation("ReceivedMessages")
+  auditLogs        AuditLog[]
+  gamification     Gamification?
+  profilePhoto     String?
+  profilePhotoPublicId String?
+  bio              String?
+  otp              String?
+  otpExpiresAt     DateTime?
+  verificationToken String?
+  announcementViews AnnouncementView[]
+  notificationSettings NotificationSetting?
+  
+  // Password Reset Fields
+  resetOtp          String?
+  resetOtpExpiresAt DateTime?
+  resetOtpVerified  Boolean   @default(false)
+  lastResetRequest  DateTime?
+  resetAttempts     Int       @default(0)
+  
+  // Tracking used invite code
+  inviteCodeUsedId Int?
+  inviteCodeUsed   SignupCode? @relation("UserSignupCode", fields: [inviteCodeUsedId], references: [id])
+
+  @@index([role])
+  @@index([collegeId])
+  @@index([verificationStatus])
+}
+
+model VerificationToken {
+  id        Int      @id @default(autoincrement())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+}
+
+model PendingUser {
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  otp         String
+  signupData  String   // JSON string of form data
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+}
+
+model Student {
+  id            Int            @id @default(autoincrement())
+  userId        Int            @unique
+  user          User           @relation(fields: [userId], references: [id])
+  department    String?
+  rollNumber    String?
+  currentYear   String?
+  totalStudents Int?
+  fullDetails   String?
+  referrals     Referral[]     @relation("StudentReferrals")
+  applications  Application[]
+  placements    Placement[]
+  registrations Registration[]
+  departmentId  String?
+  skills        String?
+  interestedJobRole String?
+  preferredCompanyType String?
+  expectedSalary String?
+  cgpa          String?
+  resumeLink    String?
+  resumePublicId String?
+  portfolioLink String?
+  githubLink    String?
+  preferredLocation String?
+  readyToRelocate String?
+  interestMode  String?
+  interestedDomain String?
+  phoneNumber   String?
+  linkedIn      String?
+  certifications String?
+  careerInterests String?
+  mentorshipRequests MentorshipRequest[]
+  resumeAnalyses ResumeAnalysis[]
+  roadmaps      CareerRoadmap[]
+  readinessScore Int            @default(0)
+  readinessHistory PlacementReadiness[]
+
+  @@index([userId])
+  @@index([departmentId])
+  @@index([readinessScore])
+}
+
+model PlacementReadiness {
+  id              Int      @id @default(autoincrement())
+  studentId       Int
+  student         Student  @relation(fields: [studentId], references: [id])
+  score           Int
+  level           String   // Beginner, Intermediate, Placement Ready
+  suggestions     String?  // JSON string
+  weaknesses      String?  // JSON string
+  strengths       String?  // JSON string
+  probability     String?
+  nextActions     String?  // JSON string
+  metrics         String?  // JSON string: { technical, resume, communication, etc. }
+  createdAt       DateTime @default(now())
+
+  @@index([studentId])
+}
+
+model Alumni {
+  id             Int            @id @default(autoincrement())
+  userId         Int            @unique
+  user           User           @relation(fields: [userId], references: [id])
+  department     String?
+  passoutYear    String?
+  company        String?
+  currentCompany String?
+  companyAddress String?
+  currentLocation String?
+  experience     String?
+  maritalStatus  String?
+  role           String?
+  verified       Boolean        @default(false)
+  alumniProofUrl String?
+  alumniProofPublicId String?
+  referrals      Referral[]     @relation("AlumniReferrals")
+  jobs           Job[]
+  webinars       Webinar[]
+  jobRole        String?
+  previousCompanies String?
+  skills         String?        // Technical Skills, Industry Expertise, Mentorship Skills
+  certifications String?
+  achievements   String?
+  readyForReferral String? @default("No")
+  readyForMentorship String? @default("No")
+  resumeReview   String? @default("No")
+  availableTime  String?
+  preferredContactMode String?
+  permanentAddress String?
+  temporaryAddress String?
+  childrenDetails String?
+  childrenCount  Int?     @default(0)
+  phoneNumber    String?
+  linkedIn       String?
+  portfolio      String?
+  mentorshipRequests MentorshipRequest[]
+  mentorshipSlots MentorshipSlot[]
+  mentorshipAchievements MentorshipAchievement[]
+  mentorshipExpertise String? // JSON string of skills/session types
+  mentorshipXP Int @default(0)
+  mentorshipImpactScore Int @default(0)
+  placements     Placement[]
+
+  @@index([userId])
+  @@index([verified])
+  @@index([readyForMentorship])
+  @@index([readyForReferral])
+}
+
+model Referral {
+  id         Int         @id @default(autoincrement())
+  studentId  Int
+  student    Student     @relation("StudentReferrals", fields: [studentId], references: [id])
+  alumniId   Int
+  alumni     Alumni      @relation("AlumniReferrals", fields: [alumniId], references: [id])
+  status     String      @default("pending") // pending, accepted, rejected
+  createdAt  DateTime    @default(now())
+  placements Placement[]
+
+  @@index([studentId])
+  @@index([alumniId])
+}
+
+model Placement {
+  id         Int       @id @default(autoincrement())
+  studentId  Int
+  student    Student   @relation(fields: [studentId], references: [id])
+  company    String
+  role       String
+  salary     String?   // Added: e.g., "12 LPA" or exact number
+  mode       String?   // Added: "On-campus" or "Off-campus"
+  date       DateTime  @default(now()) // Added: Date of placement
+  referralId Int?
+  referral   Referral? @relation(fields: [referralId], references: [id])
+  alumniId   Int?      // Added: Direct link to Alumni
+  alumni     Alumni?   @relation(fields: [alumniId], references: [id])
+  createdAt  DateTime  @default(now())
+
+  @@index([studentId])
+  @@index([company])
+}
+
+model Announcement {
+  id          Int      @id @default(autoincrement())
+  collegeId   Int
+  college     College  @relation(fields: [collegeId], references: [id])
+  title       String
+  description String
+  priority    String   @default("low") // low, medium, high
+  targetRole  String?  @default("ALL") // ALL, STUDENT, ALUMNI
+  targetDept  String?
+  targetYear  String?
+  attachment  String?
+  attachmentPublicId String?
+  isPinned    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  views       AnnouncementView[]
+}
+
+model AnnouncementView {
+  id             Int          @id @default(autoincrement())
+  announcementId Int
+  announcement   Announcement @relation(fields: [announcementId], references: [id])
+  userId         Int
+  user           User         @relation(fields: [userId], references: [id])
+  viewedAt       DateTime     @default(now())
+  @@unique([announcementId, userId])
+}
+
+model Webinar {
+  id            Int            @id @default(autoincrement())
+  title         String
+  description   String?
+  speakerName   String?
+  companyName   String?
+  type          String?        @default("ONLINE") // ONLINE, OFFLINE
+  location      String?        // Link for online, Address for offline
+  recordingUrl  String?        // URL to the recording
+  posterImage   String?        // URL to the poster/image
+  posterPublicId String?       // Cloudinary Public ID
+  domain        String?        // AI, Web Dev, etc.
+  date          DateTime
+  duration      String?        // e.g., "1.5 Hours"
+  collegeId     Int            // Institutional visibility
+  college       College        @relation(fields: [collegeId], references: [id])
+  alumniId      Int
+  alumni        Alumni         @relation(fields: [alumniId], references: [id])
+  registrations Registration[]
+  createdAt     DateTime       @default(now())
+
+  @@index([collegeId])
+  @@index([alumniId])
+  @@index([date])
+}
+
+model Registration {
+  id        Int      @id @default(autoincrement())
+  studentId Int
+  student   Student  @relation(fields: [studentId], references: [id])
+  webinarId Int
+  webinar   Webinar  @relation(fields: [webinarId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Job {
+  id              Int           @id @default(autoincrement())
+  alumniId        Int
+  alumni          Alumni        @relation(fields: [alumniId], references: [id])
+  collegeId       Int           // Link to college for institutional visibility
+  college         College        @relation(fields: [collegeId], references: [id])
+  title           String
+  company         String
+  description     String?
+  skills          String?
+  salary          String?
+  location        String?
+  workType        String?       // Remote, Hybrid, Office
+  applicationLink String?
+  lastDate        DateTime?
+  applications    Application[]
+  createdAt       DateTime      @default(now())
+
+  @@index([collegeId])
+  @@index([alumniId])
+  @@index([company])
+}
+
+model Application {
+  id        Int      @id @default(autoincrement())
+  studentId Int
+  student   Student  @relation(fields: [studentId], references: [id])
+  jobId     Int
+  job       Job      @relation(fields: [jobId], references: [id])
+  status    String   @default("applied")
+  createdAt DateTime @default(now())
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  collegeId Int      @unique
+  college   College  @relation(fields: [collegeId], references: [id])
+  plan      String   // Links to Plan name
+  status    String   @default("active") // active, expired, pending, failed
+  amount    Float    @default(0)
+  startDate DateTime @default(now())
+  endDate   DateTime
+  createdAt DateTime @default(now())
+}
+
+model Plan {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique // Free, Pro, Premium
+  price       Float
+  features    String?  // Comma-separated features
+  limits      String?  // JSON string
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // CHAT, REFERRAL, JOB, WEBINAR, etc.
+  title     String?
+  message   String
+  priority  String   @default("NORMAL") // NORMAL, IMPORTANT, URGENT
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+}
+
+model NotificationSetting {
+  id              Int     @id @default(autoincrement())
+  userId          Int     @unique
+  user            User    @relation(fields: [userId], references: [id])
+  emailEnabled    Boolean @default(true)
+  pushEnabled     Boolean @default(true)
+  webinarAlerts   Boolean @default(true)
+  jobAlerts       Boolean @default(true)
+  referralAlerts  Boolean @default(true)
+  chatAlerts      Boolean @default(true)
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  senderId   Int
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId Int
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  content    String?
+  fileUrl    String?
+  filePublicId String?
+  fileName   String?
+  fileType   String?
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+}
+
+model Gamification {
+  id      Int    @id @default(autoincrement())
+  userId  Int    @unique
+  user    User   @relation(fields: [userId], references: [id])
+  points  Int    @default(0)
+  badges  String @default("")
+}
+
+model FeatureToggle {
+  id          Int     @id @default(autoincrement())
+  featureName String  @unique
+  enabled     Boolean @default(true)
+}
+
+model MentorshipRequest {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  student     Student  @relation(fields: [studentId], references: [id])
+  alumniId    Int
+  alumni      Alumni   @relation(fields: [alumniId], references: [id])
+  status      String   @default("pending") // pending, accepted, rejected, completed, rescheduled
+  sessionType String?  // Career guidance, Resume review, etc.
+  scheduledAt DateTime?
+  meetingLink String?
+  meetingPlatform String? // Google Meet, Zoom, etc.
+  rating      Int?     // 1-5
+  review      String?
+  notes       String?
+  message     String?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([studentId])
+  @@index([alumniId])
+  @@index([status])
+}
+
+model ResumeAnalysis {
+  id               Int      @id @default(autoincrement())
+  studentId        Int
+  student          Student  @relation(fields: [studentId], references: [id])
+  fileName         String
+  fileUrl          String?
+  filePublicId     String?
+  targetRole       String?  // New: e.g., "Full Stack Developer", "AI Engineer"
+  
+  // Detailed Scores (0-100)
+  score            Int      // Overall score
+  atsScore         Int      // ATS Compatibility
+  skillScore       Int      // Technical Skills
+  projectQuality   Int      // Projects & Innovation
+  communicationScore Int    @default(0) // New: Communication & Language
+  designScore      Int      @default(0) // New: Design & Formatting
+  readinessScore   Int      @default(0) // New: Industry Readiness
+  
+  // Detailed Analysis (JSON strings)
+  suggestions      String?  // Improvement tips
+  missingSkills    String?  // Domain-specific missing tech
+  strengths        String?  // What's working
+  weaknesses       String?  // What needs help
+  projectAnalysis  String?  // New: Specific project feedback
+  skillGapAnalysis String?  // New: Student skills vs Industry expectations
+  
+  placementReadiness String? @default("Beginner") // New: Beginner, Developing, Ready, Industry Ready
+  
+  createdAt        DateTime @default(now())
+
+  @@index([studentId])
+}
+
+model MentorshipSlot {
+  id        Int      @id @default(autoincrement())
+  alumniId  Int
+  alumni    Alumni   @relation(fields: [alumniId], references: [id])
+  dayOfWeek String   // Monday, Tuesday, etc.
+  startTime String   // "09:00"
+  endTime   String   // "10:00"
+  isBooked  Boolean  @default(false)
+}
+
+model MentorshipAchievement {
+  id        Int      @id @default(autoincrement())
+  alumniId  Int
+  alumni    Alumni   @relation(fields: [alumniId], references: [id])
+  badgeName String   // Top Mentor, Career Guide, etc.
+  earnedAt  DateTime @default(now())
+}
+
+model CareerRoadmap {
+  id           Int      @id @default(autoincrement())
+  studentId    Int
+  student      Student  @relation(fields: [studentId], references: [id])
+  title        String
+  currentLevel String   @default("Beginner") // Beginner, Intermediate, Advanced
+  progress     Int      @default(0)
+  completedSteps String? // JSON string of IDs
+  steps          String? // JSON string of step definitions
+  detailedData   String? // JSON string of full AI roadmap (levels, projects, etc.)
+  createdAt    DateTime @default(now())
+}
+
+model Contact {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String
+  phoneNumber String?
+  subject     String?
+  message     String
+  createdAt   DateTime @default(now())
+}
+
+model SignupCode {
+  id              Int      @id @default(autoincrement())
+  code            String   @unique
+  collegeId       Int
+  college         College  @relation(fields: [collegeId], references: [id])
+  departmentId    Int?     // Optional, if mapped to a specific department
+  departmentName  String?  // Name for easy display
+  batch           String?  // e.g. "2026"
+  role            String   // STUDENT, ALUMNI, STAFF, HOD
+  expiryDate      DateTime?
+  usageLimit      Int?     @default(1)
+  usedCount       Int      @default(0)
+  status          String   @default("ACTIVE") // ACTIVE, DISABLED, EXPIRED
+  createdBy       Int?     // Admin user ID
+  createdAt       DateTime @default(now())
+  
+  users           User[]   @relation("UserSignupCode")
+
+  @@index([collegeId])
+  @@index([status])
+  @@index([code])
+}

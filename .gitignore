@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Local Environment Variables & Secrets
+.env
+.env.*
+.env.local
+.env.production
+backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
+
+# SQLite Database Backups & Development Databases
+*.db
+*.db.bak
+*.db-journal
+backend/prisma/*.db
+backend/prisma/*.db.bak
+backend/prisma/*.db-journal
+
+# Next.js Build Outputs & Cache
+.next/
+frontend/.next/
+out/
+frontend/out/
+
+# Application Builds
+build/
+dist/
+backend/dist/
+frontend/build/
+
+# Operating System Garbage
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE & Editor Configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

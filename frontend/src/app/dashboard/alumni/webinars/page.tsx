@@ -1,0 +1,203 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import DashboardLayout from '@/components/DashboardLayout';
+import { 
+  Video, 
+  Plus, 
+  Search, 
+  Edit, 
+  Trash2, 
+  Users, 
+  Calendar, 
+  Clock, 
+  MapPin, 
+  Globe, 
+  ChevronRight,
+  Loader2,
+  MoreVertical,
+  ArrowUpRight
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+
+export default function AlumniWebinarsPage() {
+  const [webinars, setWebinars] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    fetchWebinars();
+  }, []);
+
+  const fetchWebinars = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/webinars/alumni', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      const data = await res.json();
+      setWebinars(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this webinar?')) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/webinars/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      if (res.ok) fetchWebinars();
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const filteredWebinars = webinars.filter(w => 
+    w.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <DashboardLayout>
+      <div className="p-8 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+          <div>
+            <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2">My Webinars</h1>
+            <p className="text-slate-500 font-medium">Create and manage your knowledge sharing sessions.</p>
+          </div>
+          <Link 
+            href="/dashboard/alumni/webinars/create" 
+            className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-indigo-600 transition-all shadow-2xl shadow-slate-200 group"
+          >
+            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" /> Schedule Webinar
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {[
+            { label: 'Total Sessions', val: webinars.length, icon: <Video />, color: 'blue' },
+            { label: 'Total Attendees', val: webinars.reduce((acc, w) => acc + (w._count?.registrations || 0), 0), icon: <Users />, color: 'purple' },
+            { label: 'Avg Engagement', val: '85%', icon: <ArrowUpRight />, color: 'green' },
+          ].map((stat, i) => (
+            <div key={i} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-6">
+              <div className={`w-14 h-14 bg-${stat.color}-50 text-${stat.color}-600 rounded-2xl flex items-center justify-center`}>
+                {stat.icon}
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{stat.label}</p>
+                <h3 className="text-3xl font-black text-slate-900">{stat.val}</h3>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm mb-8 flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <input 
+              type="text" 
+              placeholder="Search your webinars..."
+              className="w-full pl-12 pr-4 py-4 bg-slate-50 border-transparent rounded-2xl focus:bg-white focus:border-indigo-500 transition-all outline-none font-bold text-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+              <Loader2 className="w-10 h-10 animate-spin mb-4" />
+              <p className="font-bold">Loading your sessions...</p>
+            </div>
+          ) : filteredWebinars.length > 0 ? (
+            filteredWebinars.map((webinar) => (
+              <motion.div 
+                layout
+                key={webinar.id}
+                className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
+                  <div className="flex gap-6 items-start">
+                    <div className="w-24 h-24 bg-slate-50 rounded-3xl flex flex-col items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors flex-shrink-0 border border-slate-100">
+                      <Calendar className="w-8 h-8 mb-1" />
+                      <span className="text-[10px] font-black uppercase">{new Date(webinar.date).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                         <h3 className="text-2xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors">{webinar.title}</h3>
+                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${webinar.type === 'ONLINE' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}`}>
+                           {webinar.type}
+                         </span>
+                      </div>
+                      <p className="text-slate-500 font-bold mb-4 flex items-center gap-4">
+                        <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-slate-400" /> {new Date(webinar.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-slate-400" /> {webinar._count?.registrations || 0} Registered</span>
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                         {webinar.domain && (
+                           <span className="px-3 py-1 bg-slate-50 rounded-lg text-[10px] font-black text-slate-400 uppercase tracking-widest">{webinar.domain}</span>
+                         )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center -space-x-4 mr-4">
+                      {webinar.registrations?.slice(0, 3).map((reg: any, i: number) => (
+                        <div key={i} className="w-10 h-10 rounded-full border-4 border-white bg-slate-200 flex items-center justify-center text-[10px] font-black" title={reg.student.user.name}>
+                          {reg.student.user.name[0]}
+                        </div>
+                      ))}
+                      {webinar._count?.registrations > 3 && (
+                        <div className="w-10 h-10 rounded-full border-4 border-white bg-slate-900 text-white flex items-center justify-center text-[10px] font-black">
+                          +{webinar._count.registrations - 3}
+                        </div>
+                      )}
+                    </div>
+                    <div className="h-10 w-[2px] bg-slate-100 mx-2 hidden lg:block"></div>
+                    <Link 
+                      href={`/dashboard/alumni/webinars/create?edit=${webinar.id}`}
+                      className="w-12 h-12 bg-slate-50 text-slate-600 rounded-2xl flex items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 transition-all"
+                    >
+                      <Edit className="w-5 h-5" />
+                    </Link>
+                    <button 
+                      onClick={() => handleDelete(webinar.id)}
+                      className="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-all"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                    <button className="bg-slate-900 text-white px-8 h-12 rounded-2xl font-black text-sm flex items-center gap-2 hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200">
+                      View Roster <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="bg-slate-50 rounded-[3rem] p-20 text-center border-2 border-dashed border-slate-200">
+              <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-slate-300 mx-auto mb-6 shadow-sm">
+                <Video className="w-10 h-10" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-900 mb-2">No webinars scheduled</h3>
+              <p className="text-slate-500 font-medium mb-8">Share your expertise and mentor the next generation of students.</p>
+              <Link 
+                href="/dashboard/alumni/webinars/create" 
+                className="inline-flex bg-slate-900 text-white px-10 py-5 rounded-2xl font-black gap-3 hover:bg-indigo-600 transition-all shadow-2xl shadow-slate-200"
+              >
+                <Plus className="w-5 h-5" /> Schedule Your First Session
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+}

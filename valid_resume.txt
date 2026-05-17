@@ -1,0 +1,23 @@
+John Doe
+Email: john@example.com
+Phone: 123-456-7890
+
+Education:
+Bachelor of Science in Computer Science, University of Technology
+Expected Graduation: 2026
+
+Experience:
+Software Engineering Intern at Tech Corp
+- Developed web applications using React and Node.js.
+- Improved database query performance by 20%.
+
+Skills:
+JavaScript, React, Node.js, Python, SQL
+
+Projects:
+1. E-commerce Website: Built a full-stack e-commerce platform.
+2. Portfolio: Designed and developed a personal portfolio.
+
+Achievements:
+- Dean's List 2024
+- First place in University Hackathon

@@ -1,0 +1,7 @@
+Question 1: What is OOSE?
+Answer: Object-Oriented Software Engineering.
+
+Question 2: Explain the waterfall model.
+Answer: It is a linear sequential design approach.
+
+Please answer all the lab questions before the deadline.
