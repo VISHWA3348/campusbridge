@@ -36,7 +36,7 @@ export default function StudentWebinarsPage() {
 
   const fetchWebinars = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/webinars', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/webinars', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();
@@ -50,7 +50,7 @@ export default function StudentWebinarsPage() {
 
   const register = async (id: number) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/webinars/${id}/register`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')}/webinars/${id}/register`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });

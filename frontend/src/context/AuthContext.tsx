@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!currentToken) return;
 
     try {
-      const res = await fetch('http://localhost:5000/api/profile/me', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/profile/me', {
         headers: { 'Authorization': `Bearer ${currentToken}` }
       });
       if (res.ok) {

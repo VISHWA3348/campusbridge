@@ -43,7 +43,7 @@ export default function SuperAdminDashboard() {
         setStats(statsData);
         
         const token = localStorage.getItem('token');
-        const featRes = await fetch('http://localhost:5000/api/admin/features', {
+        const featRes = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/admin/features', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const featData = await featRes.json();

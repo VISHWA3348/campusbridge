@@ -38,7 +38,7 @@ export default function HonorBoardPage() {
   const fetchLeaderboard = async () => {
     setLoading(true);
     try {
-      const url = new URL('http://localhost:5000/api/global/leaderboard');
+      const url = new URL((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/global/leaderboard');
       url.searchParams.append('role', activeTab);
       if (filterType === 'COLLEGE') {
         // We'll get collegeId from local storage user info

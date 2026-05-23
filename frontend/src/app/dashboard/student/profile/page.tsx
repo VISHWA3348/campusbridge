@@ -12,7 +12,7 @@ export default function StudentProfile() {
 
   useEffect(() => {
     if (token) {
-      fetch('http://localhost:5000/api/profile/me', {
+      fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/profile/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(res => res.json())

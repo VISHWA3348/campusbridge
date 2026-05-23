@@ -40,7 +40,7 @@ export default function StudentSearchPage() {
         department: filters.department
       }).toString();
 
-      const res = await fetch(`http://localhost:5000/api/alumni/students?${query}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')}/alumni/students?${query}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();

@@ -42,7 +42,7 @@ export default function StudentSettings() {
 
   useEffect(() => {
     if (user) {
-      fetch(`http://localhost:5000/api/profile/me`, {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')}/profile/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => res.json())
@@ -85,7 +85,7 @@ export default function StudentSettings() {
     setMessage('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/profile/me', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/profile/me', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ export default function StudentSettings() {
     const formData = new FormData();
     formData.append('photo', file);
 
-    const res = await fetch('http://localhost:5000/api/profile/photo', {
+    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/profile/photo', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
       body: formData
@@ -123,7 +123,7 @@ export default function StudentSettings() {
   };
 
   const handlePhotoRemove = async () => {
-    const res = await fetch('http://localhost:5000/api/profile/photo', {
+    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/profile/photo', {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -142,14 +142,14 @@ export default function StudentSettings() {
       const formData = new FormData();
       formData.append('proof', file);
       
-      const uploadRes = await fetch('http://localhost:5000/api/verification/upload-proof', {
+      const uploadRes = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/verification/upload-proof', {
         method: 'POST',
         body: formData
       });
       const uploadData = await uploadRes.json();
       if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload failed');
 
-      const updateRes = await fetch('http://localhost:5000/api/profile/re-verify', {
+      const updateRes = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/profile/re-verify', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -181,7 +181,7 @@ export default function StudentSettings() {
       const formData = new FormData();
       formData.append('resume', file);
 
-      const res = await fetch('http://localhost:5000/api/profile/resume', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/profile/resume', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData

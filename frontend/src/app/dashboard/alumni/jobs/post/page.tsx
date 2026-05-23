@@ -48,7 +48,7 @@ function PostJobPageContent() {
   const fetchJobDetails = async () => {
     setFetching(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/jobs/alumni`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')}/jobs/alumni`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const jobs = await res.json();
@@ -79,8 +79,8 @@ function PostJobPageContent() {
 
     try {
       const url = editId 
-        ? `http://localhost:5000/api/jobs/${editId}` 
-        : 'http://localhost:5000/api/jobs';
+        ? `${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')}/jobs/${editId}` 
+        : (process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/jobs';
       
       const method = editId ? 'PUT' : 'POST';
 

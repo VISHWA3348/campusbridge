@@ -36,10 +36,10 @@ export default function SignupCodesPage() {
   const fetchData = async () => {
     try {
       const [codesRes, collegesRes] = await Promise.all([
-        fetch('http://localhost:5000/api/admin/signup-codes', {
+        fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/admin/signup-codes', {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         }),
-        fetch('http://localhost:5000/api/auth/colleges')
+        fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/auth/colleges')
       ]);
       const codesData = await codesRes.json();
       const collegesData = await collegesRes.json();
@@ -56,7 +56,7 @@ export default function SignupCodesPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/admin/signup-codes', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/admin/signup-codes', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ export default function SignupCodesPage() {
   const handleDelete = async (id: number) => {
     if (!confirm('Are you sure you want to delete this code?')) return;
     try {
-      await fetch(`http://localhost:5000/api/admin/signup-codes/${id}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')}/admin/signup-codes/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
@@ -96,7 +96,7 @@ export default function SignupCodesPage() {
   const toggleStatus = async (code: any) => {
     const newStatus = code.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE';
     try {
-      await fetch(`http://localhost:5000/api/admin/signup-codes/${code.id}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')}/admin/signup-codes/${code.id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -395,7 +395,7 @@ export default function SignupCodesPage() {
             
             <div className="bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100 mb-8 inline-block mx-auto">
               <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`http://localhost:3000/signup/${selectedCode.role.toLowerCase()}?code=${selectedCode.code}`)}`} 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`${(typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')}/signup/${selectedCode.role.toLowerCase()}?code=${selectedCode.code}`)}`} 
                 alt="QR Code" 
                 className="w-48 h-48 mx-auto"
               />
@@ -404,7 +404,7 @@ export default function SignupCodesPage() {
             <div className="bg-indigo-50 p-4 rounded-2xl mb-8">
               <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Signup URL</p>
               <p className="text-xs font-bold text-indigo-700 break-all">
-                {`http://localhost:3000/signup/${selectedCode.role.toLowerCase()}?code=${selectedCode.code}`}
+                {`${(typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')}/signup/${selectedCode.role.toLowerCase()}?code=${selectedCode.code}`}
               </p>
             </div>
             
@@ -416,7 +416,7 @@ export default function SignupCodesPage() {
                 Close
               </button>
               <a 
-                href={`https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(`http://localhost:3000/signup/${selectedCode.role.toLowerCase()}?code=${selectedCode.code}`)}`}
+                href={`https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(`${(typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')}/signup/${selectedCode.role.toLowerCase()}?code=${selectedCode.code}`)}`}
                 download={`QR_${selectedCode.code}.png`}
                 target="_blank"
                 className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-2"
