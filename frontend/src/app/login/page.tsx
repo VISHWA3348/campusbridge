@@ -34,7 +34,15 @@ function LoginForm() {
         body: JSON.stringify({ credential: credentialResponse.credential })
       });
       
-      const data = await res.json();
+      let data: any = {};
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        console.error('Server returned non-JSON response:', text.substring(0, 200));
+        throw new Error('Server returned an invalid response. Please ensure the backend is running.');
+      }
       
       if (!res.ok) {
         if (data.status === 'PENDING_APPROVAL') {
@@ -45,7 +53,7 @@ function LoginForm() {
           router.push(`/auth/rejected?reason=${encodeURIComponent(data.rejectionReason || '')}`);
           return;
         }
-        throw new Error(data.error);
+        throw new Error(data.error || 'Login failed. Please try again.');
       }
       
       handleLoginSuccess(data);
@@ -68,7 +76,15 @@ function LoginForm() {
         body: JSON.stringify({ email, password })
       });
       
-      const data = await res.json();
+      let data: any = {};
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        console.error('Server returned non-JSON response:', text.substring(0, 200));
+        throw new Error('Server returned an invalid response. Please ensure the backend is running.');
+      }
       
       if (!res.ok) {
         if (data.status === 'PENDING_APPROVAL') {
@@ -79,12 +95,12 @@ function LoginForm() {
           router.push(`/auth/rejected?reason=${encodeURIComponent(data.rejectionReason || '')}`);
           return;
         }
-        throw new Error(data.error);
+        throw new Error(data.error || 'Login failed. Please try again.');
       }
       
       handleLoginSuccess(data);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'An error occurred during login. Please try again.');
     } finally {
       setLoading(false);
     }
