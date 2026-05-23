@@ -34,16 +34,30 @@ console.log("SERVER DATABASE URL:", process.env.DATABASE_URL ? process.env.DATAB
 
 const app = express();
 const httpServer = createServer(app);
+
+const ALLOWED_ORIGINS = [
+  "https://campusbridge.pages.dev",
+  "https://campusbridge.zinoingroup.in",
+  "http://localhost:3000",
+  "http://localhost:3001"
+];
+
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"]
+    origin: ALLOWED_ORIGINS,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ALLOWED_ORIGINS,
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
