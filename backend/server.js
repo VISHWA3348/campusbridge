@@ -22,7 +22,7 @@ import trackerRoutes from './routes/trackerRoutes.js';
 import recommendationRoutes from './routes/recommendationRoutes.js';
 import verificationRoutes from './routes/verificationRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
-import prisma from './prisma/db.js';
+import prisma, { connectWithRetry } from './prisma/db.js';
 import { authenticate } from './middleware/auth.js';
 import { getNotifications, markAsRead, deleteNotification, clearAllNotifications, getNotificationSettings, updateNotificationSettings } from './controllers/notificationController.js';
 import { checkFeature } from './middleware/feature.js';
@@ -192,8 +192,8 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// Verify DB connection
-prisma.$connect()
+// Verify DB connection with retry logic (Render + Supabase safe)
+connectWithRetry()
   .then(() => {
     console.log('◇ Database connected successfully');
     httpServer.listen(PORT, () => {
@@ -202,6 +202,6 @@ prisma.$connect()
     });
   })
   .catch((err) => {
-    console.error('◆ Database connection failed:', err);
+    console.error('◆ Database connection failed after retries:', err.message);
     process.exit(1);
   });
