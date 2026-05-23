@@ -7,7 +7,8 @@ import {
   deleteStudent, 
   fetchPendingVerifications, 
   approveUser, 
-  rejectUser 
+  rejectUser,
+  getFileUrl
 } from '@/lib/api';
 import { 
   User, Mail, GraduationCap, Trash2, Loader2, Search, 
@@ -168,7 +169,7 @@ export default function CollegeStudentsPage() {
                       <div className="flex items-center gap-6">
                         <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center font-black text-slate-900 text-xl border-2 border-white shadow-sm group-hover:scale-105 transition-transform overflow-hidden">
                            {u.profilePhoto ? (
-                             <img src={`http://localhost:5000/${u.profilePhoto}`} alt="" className="w-full h-full object-cover" />
+                             <img src={getFileUrl(u.profilePhoto) || ''} alt="" className="w-full h-full object-cover" />
                            ) : u.name[0]}
                         </div>
                         <div>
@@ -192,7 +193,7 @@ export default function CollegeStudentsPage() {
                       <div className="flex justify-end items-center gap-3">
                         {u.idProofUrl && (
                           <button 
-                            onClick={() => setSelectedProof(u.idProofUrl)}
+                            onClick={() => setSelectedProof(getFileUrl(u.idProofUrl))}
                             className="p-4 bg-slate-50 text-slate-400 hover:bg-slate-900 hover:text-white rounded-2xl transition-all shadow-sm group/btn relative"
                             title="View ID Proof"
                           >

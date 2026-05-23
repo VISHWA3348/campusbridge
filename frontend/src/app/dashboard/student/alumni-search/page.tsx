@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import DashboardLayout from '@/components/DashboardLayout';
-import { searchAlumni, requestMentorship } from '@/lib/api';
+import { searchAlumni, requestMentorship, getFileUrl } from '@/lib/api';
 import { Search, Filter, Briefcase, MapPin, Award, HeartHandshake, Loader2, Sparkles, MessageSquare } from 'lucide-react';
 import { useDebounce } from '@/hooks/PerformanceHooks';
 import { AlumniCardSkeleton } from '@/components/DashboardSkeletons';
@@ -121,7 +121,7 @@ export default function AlumniSearchPage() {
               <Link href={`/dashboard/profile/${alumni.user?.id}`}>
                 <div className="w-24 h-24 bg-slate-50 text-slate-900 rounded-[2rem] flex items-center justify-center mb-8 font-black text-3xl group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-inner overflow-hidden border-4 border-white shadow-xl">
                   {alumni.user?.profilePhoto ? (
-                    <img src={`http://localhost:5000/${alumni.user.profilePhoto}`} alt={alumni.user?.name || 'Alumni'} className="w-full h-full object-cover" />
+                    <img src={getFileUrl(alumni.user.profilePhoto) || ''} alt={alumni.user?.name || 'Alumni'} className="w-full h-full object-cover" />
                   ) : (
                     alumni.user?.name?.[0] || '?'
                   )}

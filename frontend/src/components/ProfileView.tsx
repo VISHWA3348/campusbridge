@@ -30,6 +30,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Linkedin } from '@/components/BrandIcons';
+import { getFileUrl } from '@/lib/api';
 
 interface ProfileViewProps {
   data: any;
@@ -64,7 +65,7 @@ export default function ProfileView({ data }: ProfileViewProps) {
             <div className="relative w-56 h-56 bg-slate-900 rounded-[2.5rem] overflow-hidden flex items-center justify-center border-4 border-white shadow-2xl">
               {data.profilePhoto ? (
                 <img 
-                  src={`http://localhost:5000/${data.profilePhoto}`} 
+                  src={getFileUrl(data.profilePhoto) || ''} 
                   alt={data.name} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />

@@ -47,3 +47,6 @@ Desktop.ini
 *.njsproj
 *.sln
 *.sw?
+
+# Temporary Cache Folders
+next_old_tmp/

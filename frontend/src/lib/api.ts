@@ -759,3 +759,11 @@ export async function fetchNotifications() {
   const res = await fetch(`${API_BASE_URL}/notifications`, { headers: getHeaders() });
   return res.json();
 }
+
+// --- Utilities ---
+export function getFileUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  if (url.startsWith('http')) return url;
+  return `http://localhost:5000/${url}`;
+}
+

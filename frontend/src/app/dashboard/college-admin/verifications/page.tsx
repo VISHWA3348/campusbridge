@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
+import { getFileUrl } from '@/lib/api';
 import { 
   CheckCircle2, 
   XCircle, 
@@ -206,15 +207,12 @@ export default function VerificationsPage() {
                         {selectedUser.idProofUrl || selectedUser.alumni?.alumniProofUrl ? (
                           <>
                             <img 
-                              src={(selectedUser.idProofUrl || selectedUser.alumni?.alumniProofUrl).startsWith('http') 
-                                ? (selectedUser.idProofUrl || selectedUser.alumni?.alumniProofUrl) 
-                                : `http://localhost:5000${selectedUser.idProofUrl || selectedUser.alumni?.alumniProofUrl}`
-                              } 
+                              src={getFileUrl(selectedUser.idProofUrl || selectedUser.alumni?.alumniProofUrl) || ''} 
                               alt="Verification Proof" 
                               className="w-full h-full object-cover transition-transform group-hover:scale-105"
                               onError={(e: any) => {
                                 e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'flex';
+                                (e.target.nextSibling as HTMLElement).style.display = 'flex';
                               }}
                             />
                             <div className="hidden absolute inset-0 bg-slate-50 flex-col items-center justify-center p-8 text-center">
@@ -222,10 +220,7 @@ export default function VerificationsPage() {
                               <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Document View (PDF/File)</p>
                             </div>
                             <a 
-                              href={(selectedUser.idProofUrl || selectedUser.alumni?.alumniProofUrl).startsWith('http') 
-                                ? (selectedUser.idProofUrl || selectedUser.alumni?.alumniProofUrl) 
-                                : `http://localhost:5000${selectedUser.idProofUrl || selectedUser.alumni?.alumniProofUrl}`
-                              }
+                              href={getFileUrl(selectedUser.idProofUrl || selectedUser.alumni?.alumniProofUrl) || '#'}
                               target="_blank"
                               className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
                             >

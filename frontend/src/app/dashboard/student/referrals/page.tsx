@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { fetchStudentReferrals } from '@/lib/api';
+import { fetchStudentReferrals, getFileUrl } from '@/lib/api';
 import { Clock, CheckCircle2, XCircle, User, MapPin, Briefcase } from 'lucide-react';
 
 export default function StudentReferralsPage() {
@@ -101,7 +101,7 @@ export default function StudentReferralsPage() {
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center font-black text-lg overflow-hidden border-2 border-slate-100 shadow-sm">
                         {r.alumni?.user?.profilePhoto ? (
-                          <img src={`http://localhost:5000/${r.alumni.user.profilePhoto}`} alt={r.alumni.user.name} className="w-full h-full object-cover" />
+                          <img src={getFileUrl(r.alumni.user.profilePhoto) || ''} alt={r.alumni.user.name} className="w-full h-full object-cover" />
                         ) : (
                           r.alumni?.user?.name?.[0] || '?'
                         )}

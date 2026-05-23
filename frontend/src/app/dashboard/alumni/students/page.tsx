@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/context/AuthContext';
+import { getFileUrl } from '@/lib/api';
 import { 
   Search, 
   GraduationCap, 
@@ -111,7 +112,7 @@ export default function StudentSearchPage() {
                 <div className="flex items-center gap-6 mb-8 relative">
                   <div className="w-20 h-20 bg-slate-50 rounded-[1.8rem] overflow-hidden flex items-center justify-center font-black text-2xl shadow-sm border border-slate-100 group-hover:border-indigo-200 transition-all">
                     {student.user?.profilePhoto ? (
-                      <img src={`http://localhost:5000/${student.user.profilePhoto}`} className="w-full h-full object-cover" />
+                      <img src={getFileUrl(student.user.profilePhoto) || ''} className="w-full h-full object-cover" />
                     ) : (student.user?.name?.[0] || '?')}
                   </div>
                   <div>

@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Camera, X, Upload, Trash2 } from 'lucide-react';
+import { getFileUrl } from '@/lib/api';
 
 interface ImageUploadProps {
   currentImage?: string | null;
@@ -11,11 +12,7 @@ interface ImageUploadProps {
 
 export default function ImageUpload({ currentImage, onUpload, onRemove }: ImageUploadProps) {
   const [loading, setLoading] = useState(false);
-  const [preview, setPreview] = useState<string | null>(
-    currentImage 
-      ? (currentImage.startsWith('http') ? currentImage : `http://localhost:5000/${currentImage}`) 
-      : null
-  );
+  const [preview, setPreview] = useState<string | null>(getFileUrl(currentImage));
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const compressImage = (file: File): Promise<Blob> => {

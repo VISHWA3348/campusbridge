@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { io } from 'socket.io-client';
+import { getFileUrl } from '@/lib/api';
 import {
   LayoutDashboard,
   Users,
@@ -330,7 +331,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             >
                               <div className="w-8 h-8 bg-slate-900 text-white rounded-lg overflow-hidden flex items-center justify-center font-black text-xs">
                                 {u.profilePhoto ? (
-                                  <img src={`http://localhost:5000/${u.profilePhoto}`} alt={u.name} className="w-full h-full object-cover" />
+                                  <img src={getFileUrl(u.profilePhoto) || ''} alt={u.name} className="w-full h-full object-cover" />
                                 ) : (
                                   u.name[0]
                                 )}
@@ -455,7 +456,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
               <div className="w-10 h-10 bg-slate-900 text-white rounded-xl overflow-hidden flex items-center justify-center font-black border-2 border-white shadow-sm shrink-0">
                 {user?.profilePhoto ? (
-                  <img src={`http://localhost:5000/${user.profilePhoto}`} alt={user.name} className="w-full h-full object-cover" />
+                  <img src={getFileUrl(user.profilePhoto) || ''} alt={user.name} className="w-full h-full object-cover" />
                 ) : (
                   user?.name?.[0]
                 )}

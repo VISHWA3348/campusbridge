@@ -10,7 +10,8 @@ import {
   deleteMentorshipSlot,
   fetchMentorshipAnalytics,
   updateAlumniExpertise,
-  fetchAlumniProfile
+  fetchAlumniProfile,
+  getFileUrl
 } from '@/lib/api';
 import { 
   Users, 
@@ -212,7 +213,7 @@ export default function AlumniMentorship() {
                         <div className="flex items-center gap-6">
                           <div className="w-20 h-20 bg-white text-indigo-600 rounded-[1.5rem] flex items-center justify-center font-black text-2xl shadow-sm border border-slate-100 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                             {req.student.user.profilePhoto ? (
-                              <img src={`http://localhost:5000/${req.student.user.profilePhoto}`} className="w-full h-full object-cover rounded-[1.5rem]" />
+                              <img src={getFileUrl(req.student.user.profilePhoto) || ''} className="w-full h-full object-cover rounded-[1.5rem]" />
                             ) : (req.student.user.name[0])}
                           </div>
                           <div>

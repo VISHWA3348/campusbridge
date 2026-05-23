@@ -22,6 +22,7 @@ import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { getFileUrl } from '@/lib/api';
 
 const socket = io('http://localhost:5000');
 
@@ -333,7 +334,7 @@ export default function ChatSystem() {
                   <div className="relative flex-shrink-0">
                     <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-200 flex items-center justify-center font-black text-lg shadow-sm">
                       {conv.user?.profilePhoto ? (
-                        <img src={`http://localhost:5000/${conv.user.profilePhoto}`} alt={conv.user?.name} className="w-full h-full object-cover" />
+                        <img src={getFileUrl(conv.user.profilePhoto) || ''} alt={conv.user?.name} className="w-full h-full object-cover" />
                       ) : (conv.user?.name?.[0] || '?')}
                     </div>
                     {onlineUsers.includes(conv.user.id) && (
@@ -376,7 +377,7 @@ export default function ChatSystem() {
                       className="w-full p-4 rounded-[1.5rem] flex items-center gap-4 transition-all hover:bg-white shadow-sm hover:shadow-xl hover:shadow-slate-200/50 group"
                     >
                       <div className="w-12 h-12 rounded-xl overflow-hidden bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-sm">
-                        {u.profilePhoto ? <img src={`http://localhost:5000/${u.profilePhoto}`} className="w-full h-full object-cover" /> : (u.name?.[0] || '?')}
+                        {u.profilePhoto ? <img src={getFileUrl(u.profilePhoto) || ''} className="w-full h-full object-cover" /> : (u.name?.[0] || '?')}
                       </div>
                       <div className="flex-1 text-left">
                         <p className="font-black text-slate-900 text-sm">{u.name || 'Unknown User'}</p>
@@ -414,7 +415,7 @@ export default function ChatSystem() {
                 <div className="relative">
                   <div className="w-12 h-12 rounded-2xl overflow-hidden bg-slate-200 flex items-center justify-center font-black shadow-sm">
                     {selectedUser.profilePhoto ? (
-                      <img src={`http://localhost:5000/${selectedUser.profilePhoto}`} alt={selectedUser.name} className="w-full h-full object-cover" />
+                      <img src={getFileUrl(selectedUser.profilePhoto) || ''} alt={selectedUser.name} className="w-full h-full object-cover" />
                     ) : (selectedUser.name?.[0] || '?')}
                   </div>
                   {onlineUsers.includes(selectedUser.id) && (
@@ -474,7 +475,7 @@ export default function ChatSystem() {
                         {msg.fileUrl ? (
                           <div className="flex items-center gap-4 p-2">
                             {msg.fileType?.includes('image') ? (
-                              <img src={`http://localhost:5000/${msg.fileUrl}`} alt="Attached" className="max-w-full rounded-xl" />
+                              <img src={getFileUrl(msg.fileUrl) || ''} alt="Attached" className="max-w-full rounded-xl" />
                             ) : (
                               <>
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isMe ? 'bg-white/10' : 'bg-indigo-50 text-indigo-600'}`}>
@@ -483,7 +484,7 @@ export default function ChatSystem() {
                                 <div className="min-w-0 flex-1">
                                   <p className="text-xs font-black truncate mb-1">{msg.fileName}</p>
                                   <a
-                                    href={`http://localhost:5000/${msg.fileUrl}`}
+                                    href={getFileUrl(msg.fileUrl) || '#'}
                                     download
                                     className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-1 hover:underline ${isMe ? 'text-indigo-300' : 'text-indigo-600'}`}
                                   >

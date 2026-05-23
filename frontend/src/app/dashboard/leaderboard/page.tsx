@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { getFileUrl } from '@/lib/api';
 
 export default function HonorBoardPage() {
   const router = useRouter();
@@ -167,7 +168,7 @@ export default function HonorBoardPage() {
                           >
                             <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 border-2 border-white shadow-sm">
                               {entry.photo ? (
-                                <img src={`http://localhost:5000/${entry.photo}`} className="w-full h-full object-cover" />
+                                <img src={getFileUrl(entry.photo) || ''} className="w-full h-full object-cover" />
                               ) : <div className="w-full h-full flex items-center justify-center font-black text-xl text-slate-300">{entry.name[0]}</div>}
                             </div>
                             <div>
@@ -238,7 +239,7 @@ function PodiumItem({ entry, rank, color }: { entry: any, rank: number, color: s
         <div className={`w-32 h-32 rounded-[2.5rem] p-1.5 ${isFirst ? 'bg-gradient-to-tr from-amber-200 via-amber-400 to-amber-200 shadow-2xl' : 'bg-slate-100'}`}>
           <div className="w-full h-full rounded-[2.2rem] overflow-hidden bg-white relative">
             {entry.photo ? (
-              <img src={`http://localhost:5000/${entry.photo}`} className="w-full h-full object-cover" />
+              <img src={getFileUrl(entry.photo) || ''} className="w-full h-full object-cover" />
             ) : <div className="w-full h-full flex items-center justify-center font-black text-4xl text-slate-200">{entry.name[0]}</div>}
           </div>
         </div>

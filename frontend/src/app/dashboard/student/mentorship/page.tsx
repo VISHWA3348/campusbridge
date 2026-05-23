@@ -7,7 +7,8 @@ import {
   fetchAlumniSlots, 
   requestMentorship, 
   fetchStudentMentorshipRequests,
-  submitMentorshipFeedback
+  submitMentorshipFeedback,
+  getFileUrl
 } from '@/lib/api';
 import { 
   Users, 
@@ -180,7 +181,7 @@ export default function MentorshipPage() {
                   <div className="flex items-center gap-6 mb-8">
                     <div className="w-20 h-20 bg-slate-50 text-indigo-600 rounded-[1.5rem] flex items-center justify-center font-black text-2xl shadow-sm border border-slate-100 group-hover:bg-indigo-600 group-hover:text-white transition-all overflow-hidden">
                       {a.user?.profilePhoto ? (
-                        <img src={`http://localhost:5000/${a.user.profilePhoto}`} className="w-full h-full object-cover" />
+                        <img src={getFileUrl(a.user.profilePhoto) || ''} className="w-full h-full object-cover" />
                       ) : (a.user?.name?.[0] || '?')}
                     </div>
                     <div>
@@ -255,7 +256,7 @@ export default function MentorshipPage() {
                       <div className="flex items-center gap-6">
                         <div className="w-16 h-16 bg-white text-indigo-600 rounded-2xl flex items-center justify-center font-black text-xl shadow-sm border border-slate-100 group-hover:bg-indigo-600 group-hover:text-white transition-all overflow-hidden">
                           {req.alumni.user.profilePhoto ? (
-                            <img src={`http://localhost:5000/${req.alumni.user.profilePhoto}`} className="w-full h-full object-cover" />
+                            <img src={getFileUrl(req.alumni.user.profilePhoto) || ''} className="w-full h-full object-cover" />
                           ) : (req.alumni.user.name[0])}
                         </div>
                         <div>

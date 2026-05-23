@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
+import { getFileUrl } from '@/lib/api';
 import { 
   Video, 
   Search, 
@@ -158,7 +159,7 @@ export default function StudentWebinarsPage() {
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden">
                          {webinar.alumni.user.profilePhoto ? (
-                           <img src={`http://localhost:5000/${webinar.alumni.user.profilePhoto}`} className="w-full h-full object-cover" />
+                           <img src={getFileUrl(webinar.alumni.user.profilePhoto) || ''} className="w-full h-full object-cover" />
                          ) : <User className="w-4 h-4 text-slate-400" />}
                       </div>
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Shared by {webinar.alumni.user.name}</span>
