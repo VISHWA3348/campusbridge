@@ -13,7 +13,8 @@ import {
   Bell,
   ArrowRight,
   Download,
-  Info
+  Info,
+  Paperclip
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 

@@ -179,7 +179,11 @@ export default function CareerRoadmapPage() {
                     className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 hover:bg-white hover:shadow-2xl hover:border-indigo-100 transition-all group relative overflow-hidden"
                   >
                     <div className={`w-16 h-16 bg-white text-${goal.color}-600 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-md`}>
-                      {React.cloneElement(goal.icon as React.ReactElement, { className: "w-8 h-8" })}
+                      {React.isValidElement(goal.icon)
+                        ? React.cloneElement(goal.icon as React.ReactElement<any>, {
+                            className: "w-8 h-8",
+                          })
+                        : goal.icon}
                     </div>
                     <span className="text-[11px] font-black uppercase tracking-widest text-slate-900 block">{goal.title}</span>
                   </button>

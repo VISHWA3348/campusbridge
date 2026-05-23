@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { 
   Briefcase, 
@@ -20,7 +20,7 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function PostJobPage() {
+function PostJobContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
@@ -283,5 +283,19 @@ export default function PostJobPage() {
         </div>
       </div>
     </DashboardLayout>
+  );
+}
+
+export default function PostJobPage() {
+  return (
+    <Suspense fallback={
+      <DashboardLayout>
+        <div className="flex items-center justify-center py-40">
+          <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
+        </div>
+      </DashboardLayout>
+    }>
+      <PostJobContent />
+    </Suspense>
   );
 }

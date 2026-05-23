@@ -121,7 +121,9 @@ export default function SuperAdminDashboard() {
               className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:border-indigo-200 transition-all group h-full flex flex-col justify-between"
             >
               <div className={`w-16 h-16 bg-${card.color}-50 text-${card.color}-600 rounded-[1.5rem] flex items-center justify-center mb-8 transition-transform group-hover:scale-110 shadow-sm`}>
-                {React.cloneElement(card.icon as React.ReactElement, { size: 28 })}
+                {React.isValidElement(card.icon)
+                  ? React.cloneElement(card.icon as React.ReactElement<any>, { size: 28 })
+                  : card.icon}
               </div>
               <div>
                 <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">{card.label}</p>

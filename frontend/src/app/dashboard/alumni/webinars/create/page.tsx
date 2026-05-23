@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { 
   Video, 
@@ -22,7 +22,7 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function CreateWebinarPage() {
+function CreateWebinarContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
@@ -321,5 +321,19 @@ export default function CreateWebinarPage() {
         </div>
       </div>
     </DashboardLayout>
+  );
+}
+
+export default function CreateWebinarPage() {
+  return (
+    <Suspense fallback={
+      <DashboardLayout>
+        <div className="flex items-center justify-center py-40">
+          <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
+        </div>
+      </DashboardLayout>
+    }>
+      <CreateWebinarContent />
+    </Suspense>
   );
 }

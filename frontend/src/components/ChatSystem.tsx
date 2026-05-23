@@ -26,7 +26,7 @@ import { getFileUrl } from '@/lib/api';
 
 const socket = io('http://localhost:5000');
 
-export default function ChatSystem() {
+function ChatSystemContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const initialUserId = searchParams.get('userId');
@@ -556,6 +556,18 @@ export default function ChatSystem() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ChatSystem() {
+  return (
+    <React.Suspense fallback={
+      <div className="h-[calc(100vh-140px)] bg-white rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center justify-center">
+        <Loader2 className="animate-spin text-slate-300 w-12 h-12" />
+      </div>
+    }>
+      <ChatSystemContent />
+    </React.Suspense>
   );
 }
 

@@ -34,12 +34,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
 export default function MentorshipPage() {
-  const [alumni, setAlumni] = useState([]);
-  const [myRequests, setMyRequests] = useState([]);
+  const [alumni, setAlumni] = useState<any[]>([]);
+  const [myRequests, setMyRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAlumni, setSelectedAlumni] = useState<any>(null);
-  const [slots, setSlots] = useState([]);
+  const [slots, setSlots] = useState<any[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState('browse'); // browse, my-requests

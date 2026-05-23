@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { XCircle, ArrowLeft, AlertTriangle, RefreshCcw, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 
-export default function VerificationRejected() {
+function RejectedContent() {
   const searchParams = useSearchParams();
   const reason = searchParams.get('reason');
 
@@ -57,5 +57,13 @@ export default function VerificationRejected() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function VerificationRejected() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-400 font-black">Loading...</div>}>
+      <RejectedContent />
+    </Suspense>
   );
 }
