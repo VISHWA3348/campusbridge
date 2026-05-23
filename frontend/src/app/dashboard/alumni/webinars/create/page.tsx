@@ -22,7 +22,7 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-function CreateWebinarContent() {
+function CreateWebinarPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
@@ -333,7 +333,7 @@ export default function CreateWebinarPage() {
         </div>
       </DashboardLayout>
     }>
-      <CreateWebinarContent />
+      <CreateWebinarPageContent />
     </Suspense>
   );
 }

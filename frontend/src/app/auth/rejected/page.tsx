@@ -6,7 +6,7 @@ import { XCircle, ArrowLeft, AlertTriangle, RefreshCcw, HelpCircle } from 'lucid
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 
-function RejectedContent() {
+function VerificationRejectedContent() {
   const searchParams = useSearchParams();
   const reason = searchParams.get('reason');
 
@@ -62,8 +62,8 @@ function RejectedContent() {
 
 export default function VerificationRejected() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-400 font-black">Loading...</div>}>
-      <RejectedContent />
+    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 text-slate-400 font-bold uppercase tracking-widest text-xs animate-pulse">Loading...</div>}>
+      <VerificationRejectedContent />
     </Suspense>
   );
 }

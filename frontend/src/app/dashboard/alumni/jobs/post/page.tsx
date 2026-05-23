@@ -20,7 +20,7 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-function PostJobContent() {
+function PostJobPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('edit');
@@ -295,7 +295,7 @@ export default function PostJobPage() {
         </div>
       </DashboardLayout>
     }>
-      <PostJobContent />
+      <PostJobPageContent />
     </Suspense>
   );
 }
