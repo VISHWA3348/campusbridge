@@ -18,19 +18,19 @@ export default function PublicProfileView() {
       fetch(`http://localhost:5000/api/profile/${params.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-      .then(res => {
-        if (!res.ok) throw new Error('User not found or access denied');
-        return res.json();
-      })
-      .then(data => {
-        setProfileData(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setError(err.message);
-        setLoading(false);
-      });
+        .then(res => {
+          if (!res.ok) throw new Error('User not found or access denied');
+          return res.json();
+        })
+        .then(data => {
+          setProfileData(data);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error(err);
+          setError(err.message);
+          setLoading(false);
+        });
     }
   }, [token, params.id]);
 
