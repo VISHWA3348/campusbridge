@@ -12,7 +12,7 @@ export default function AlumniProfile() {
 
   useEffect(() => {
     if (token) {
-      fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/profile/me', {
+      fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')) + '/profile/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(res => res.json())

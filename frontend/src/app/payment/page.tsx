@@ -41,7 +41,7 @@ function PaymentContent() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/payment/process', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')) + '/payment/process', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

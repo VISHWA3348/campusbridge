@@ -19,7 +19,7 @@ function VerifyEmailContent() {
       return;
     }
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')}/auth/verify-email?token=${token}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/auth/verify-email?token=${token}`)
       .then(res => res.json())
       .then(data => {
         if (data.error) {

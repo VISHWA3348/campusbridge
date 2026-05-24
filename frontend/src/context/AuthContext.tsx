@@ -67,14 +67,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!currentToken) return;
 
     try {
-      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/profile/me', {
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api')
+        ? process.env.NEXT_PUBLIC_API_URL
+        : 'https://campusbridge-e4cv.onrender.com/api';
+      const res = await fetch(baseUrl + '/profile/me', {
         headers: { 'Authorization': `Bearer ${currentToken}` }
       });
       if (res.ok) {
-        const freshUser = await res.json();
-        setUser(freshUser);
-        localStorage.setItem('user', JSON.stringify(freshUser));
-        return freshUser;
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const freshUser = await res.json();
+          setUser(freshUser);
+          localStorage.setItem('user', JSON.stringify(freshUser));
+          return freshUser;
+        } else {
+          console.warn('refreshUser: Server returned non-JSON response');
+        }
       }
     } catch (err) {
       console.error('Failed to refresh user:', err);

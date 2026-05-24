@@ -19,7 +19,7 @@ function VerifyContent() {
       return;
     }
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')}/auth/verify?token=${token}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/auth/verify?token=${token}`)
       .then(async (res) => {
         const data = await res.json();
         if (res.ok) {

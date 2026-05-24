@@ -28,7 +28,10 @@ function LoginForm() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/auth/google-login', {
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api')
+        ? process.env.NEXT_PUBLIC_API_URL
+        : 'https://campusbridge-e4cv.onrender.com/api';
+      const res = await fetch(baseUrl + '/auth/google-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: credentialResponse.credential })
@@ -37,7 +40,12 @@ function LoginForm() {
       let data: any = {};
       const contentType = res.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
-        data = await res.json();
+        try {
+          data = await res.json();
+        } catch (jsonErr) {
+          console.error('Failed to parse Google login JSON:', jsonErr);
+          throw new Error('Server returned an invalid JSON response. Please try again.');
+        }
       } else {
         const text = await res.text();
         console.error('Server returned non-JSON response:', text.substring(0, 200));
@@ -70,7 +78,10 @@ function LoginForm() {
     setError('');
     
     try {
-      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/auth/login', {
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api')
+        ? process.env.NEXT_PUBLIC_API_URL
+        : 'https://campusbridge-e4cv.onrender.com/api';
+      const res = await fetch(baseUrl + '/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -79,7 +90,12 @@ function LoginForm() {
       let data: any = {};
       const contentType = res.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
-        data = await res.json();
+        try {
+          data = await res.json();
+        } catch (jsonErr) {
+          console.error('Failed to parse login JSON:', jsonErr);
+          throw new Error('Server returned an invalid JSON response. Please try again.');
+        }
       } else {
         const text = await res.text();
         console.error('Server returned non-JSON response:', text.substring(0, 200));

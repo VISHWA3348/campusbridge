@@ -16,7 +16,7 @@ export default function NotificationCenter() {
   const fetchNotifications = async (pageNum = 1, reset = false) => {
     try {
       setLoading(true);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')}/notifications?page=${pageNum}&limit=10&unreadOnly=${activeTab === 'unread'}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/notifications?page=${pageNum}&limit=10&unreadOnly=${activeTab === 'unread'}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();
@@ -50,7 +50,7 @@ export default function NotificationCenter() {
   };
 
   const markAllRead = async () => {
-    await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/notifications/read', {
+    await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')) + '/notifications/read', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
@@ -58,7 +58,7 @@ export default function NotificationCenter() {
   };
 
   const deleteNotification = async (id: number) => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')}/notifications/${id}`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/notifications/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
@@ -67,7 +67,7 @@ export default function NotificationCenter() {
 
   const clearAll = async () => {
     if (confirm('Clear all notifications?')) {
-      await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api')) + '/notifications', {
+      await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')) + '/notifications', {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
