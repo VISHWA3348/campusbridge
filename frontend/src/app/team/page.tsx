@@ -15,8 +15,8 @@ const teamMembers = [
     description: 'Visionary entrepreneur leading innovation in networking, digital transformation, and professional growth ecosystems.',
     image: '/img/team/vishwa.jpeg',
     social: {
-      instagram: 'https://www.instagram.com/theva._?igsh=MWx4ZGQydHQxYTE4bw%3D%3D&utm',
-      linkedin: 'https://www.linkedin.com/in/vis-b0ba2834b?utm_content=profile&utm_medium=member_android&utm',
+      instagram: 'https://www.instagram.com/thevishwa._?igsh=MWx4ZGQydHQxYTE4bw==',
+      linkedin: 'https://www.linkedin.com/in/vishwa-k-b0ba2834b?utm_source=share_via&utm_content=profile&utm_medium=member_android',
       email: 'mailto:thevishofficial@gmail.com'
     }
   },
@@ -26,8 +26,8 @@ const teamMembers = [
     description: 'strategist ensuring excellence in project execution and institutional partnerships.',
     image: '/img/team/seeman.jpg',
     social: {
-      instagram: 'https://www.instagram.com/dhe._spyro._?igsh=MWVidmYxYTltb2E2bw%3D%3D&utm',
-      linkedin: 'https://www.linkedin.com/in/seeman-seeman-3b5468380?utm_content=profile&utm_medium=member_android&utm',
+      instagram: 'https://www.instagram.com/dhe._spyro._?igsh=MWVidmYxYTltb2E2bw==',
+      linkedin: 'https://www.linkedin.com/in/seeman-seeman-3b5468380?utm_source=share_via&utm_content=profile&utm_medium=member_android',
       email: 'mailto:seemanvishal@gmail.com'
     }
   },
