@@ -27,6 +27,7 @@ export default function Footer() {
     legal: [
       { name: 'Terms & Conditions', href: '/terms' },
       { name: 'Privacy Policy', href: '/privacy' },
+      { name: 'Cookie Policy', href: '/cookies' },
     ],
     social: [
       { name: 'LinkedIn', href: 'https://www.linkedin.com/company/zinoin/', icon: <Linkedin className="w-5 h-5" /> },

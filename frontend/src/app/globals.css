@@ -11,17 +11,19 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Premium, modern SaaS typography scale overrides */
-  --text-xs: 0.725rem;
-  --text-sm: 0.825rem;
-  --text-base: 0.925rem;
-  --text-lg: 1.075rem;
-  --text-xl: 1.2rem;
-  --text-2xl: 1.375rem;
-  --text-3xl: 1.625rem;
-  --text-4xl: 2rem;
-  --text-5xl: 2.5rem;
-  --text-6xl: 3.25rem;
+  /* Premium, modern, and compact SaaS typography scale overrides */
+  --text-xs: 0.7rem;
+  --text-sm: 0.8rem;
+  --text-base: 0.875rem;
+  --text-lg: 1.025rem;
+  --text-xl: 1.15rem;
+  --text-2xl: 1.3rem;
+  --text-3xl: 1.5rem;
+  --text-4xl: 1.875rem;
+  --text-5xl: 2.25rem;
+  --text-6xl: 2.75rem;
+  --text-7xl: 3.5rem;
+  --text-8xl: 4.5rem;
 }
 
 @layer base {

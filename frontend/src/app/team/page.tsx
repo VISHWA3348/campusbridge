@@ -12,7 +12,7 @@ const teamMembers = [
   {
     name: 'Vishwa K',
     role: 'Founder of Zinoin Group',
-    description: 'Visionary leader driving innovation in alumni networking and professional growth ecosystems.',
+    description: 'Visionary entrepreneur leading innovation in networking, digital transformation, and professional growth ecosystems.',
     image: '/img/team/vishwa.jpeg',
     social: {
       instagram: 'https://www.instagram.com/theva._?igsh=MWx4ZGQydHQxYTE4bw%3D%3D&utm',
