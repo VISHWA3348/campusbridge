@@ -14,8 +14,70 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CampusBridge",
-  description: "The premium network connecting students and alumni for professional success",
+  title: {
+    default: "CampusBridge - Student Alumni Network & Placement Platform",
+    template: "%s | CampusBridge"
+  },
+  description: "CampusBridge connects students and alumni for professional mentorship, job referrals, and campus placement tracking. Build your professional network today.",
+  keywords: [
+    "alumni management platform",
+    "campus placement",
+    "student alumni network",
+    "mentorship platform",
+    "referral system",
+    "placement tracking",
+    "CampusBridge",
+    "career network",
+    "professional mentorship",
+    "college admin portal"
+  ],
+  authors: [{ name: "CampusBridge Team" }],
+  creator: "CampusBridge",
+  metadataBase: new URL("https://campusbridge.zinoingroup.in"),
+  alternates: {
+    canonical: "https://campusbridge.zinoingroup.in",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    title: "CampusBridge - Student Alumni Network & Placement Platform",
+    description: "The premium network connecting students, alumni, and colleges for career mentorship, job referrals, and campus placement tracking.",
+    url: "https://campusbridge.zinoingroup.in",
+    siteName: "CampusBridge",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "CampusBridge - Connecting Students & Alumni",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CampusBridge - Student Alumni Network & Placement Platform",
+    description: "The premium network connecting students, alumni, and colleges for career mentorship, job referrals, and campus placement tracking.",
+    images: ["/logo.png"],
+    creator: "@CampusBridge",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  }
 };
 
 export default function RootLayout({

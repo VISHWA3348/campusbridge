@@ -23,7 +23,7 @@ const teamMembers = [
   {
     name: 'Seeman P',
     role: 'Project Director',
-    description: 'Expert strategist ensuring excellence in project execution and institutional partnerships.',
+    description: 'strategist ensuring excellence in project execution and institutional partnerships.',
     image: '/img/team/seeman.jpg',
     social: {
       instagram: 'https://www.instagram.com/dhe._spyro._?igsh=MWVidmYxYTltb2E2bw%3D%3D&utm',
@@ -34,7 +34,7 @@ const teamMembers = [
   {
     name: 'Brighty S',
     role: 'Managing Director of Zinoin Group',
-    description: 'Expert strategist ensuring excellence in project execution and institutional partnerships.',
+    description: 'Forward-thinking executive dedicated to innovation, operational excellence, and creating future-ready platforms that empower institutions and professionals.',
     image: '/img/team/brighty.jpeg',
     social: {
       instagram: 'https://www.instagram.com/zinoingroup?igsh=MTJvNmR0azIwbmhhNw==',
