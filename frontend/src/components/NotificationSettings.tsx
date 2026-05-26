@@ -11,7 +11,7 @@ export default function NotificationSettings() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')) + '/notifications/settings', {
+      const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))) + '/notifications/settings', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();
@@ -55,7 +55,7 @@ export default function NotificationSettings() {
         chatAlerts: settings.find(s => s.type === 'CHATS')?.email || false,
       };
 
-      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')) + '/notifications/settings', {
+      const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))) + '/notifications/settings', {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

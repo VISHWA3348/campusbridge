@@ -38,7 +38,7 @@ export default function HonorBoardPage() {
   const fetchLeaderboard = async () => {
     setLoading(true);
     try {
-      const url = new URL((process.env.NEXT_PUBLIC_API_URL || (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')) + '/global/leaderboard');
+      const url = new URL(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))) + '/global/leaderboard');
       url.searchParams.append('role', activeTab);
       if (filterType === 'COLLEGE') {
         // We'll get collegeId from local storage user info
