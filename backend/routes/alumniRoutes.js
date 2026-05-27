@@ -88,24 +88,39 @@ router.get('/placements', async (req, res) => {
 router.get('/students', async (req, res) => {
   try {
     const { q, department } = req.query;
+    const searchTerm = q ? String(q) : '';
+
+    const where = {
+      user: {
+        collegeId: req.user.collegeId,
+        role: 'STUDENT'
+      }
+    };
+
+    // Build AND array for additional filters
+    const andConditions = [];
+
+    if (department) {
+      andConditions.push({ department: { contains: String(department) } });
+    }
+
+    if (searchTerm) {
+      andConditions.push({
+        OR: [
+          { skills: { contains: searchTerm } },
+          { interestedDomain: { contains: searchTerm } },
+          { user: { name: { contains: searchTerm } } },
+          { user: { email: { contains: searchTerm } } }
+        ]
+      });
+    }
+
+    if (andConditions.length > 0) {
+      where.AND = andConditions;
+    }
+
     const students = await prisma.student.findMany({
-      where: {
-        user: {
-          collegeId: req.user.collegeId,
-          role: 'STUDENT',
-          OR: q ? [
-            { name: { contains: String(q) } },
-            { email: { contains: String(q) } }
-          ] : undefined
-        },
-        AND: [
-          department ? { department: { contains: String(department) } } : {}
-        ],
-        OR: q ? [
-          { skills: { contains: String(q) } },
-          { interestedDomain: { contains: String(q) } }
-        ] : undefined
-      },
+      where,
       include: {
         user: {
           select: {
@@ -124,5 +139,6 @@ router.get('/students', async (req, res) => {
     res.status(500).json({ error: 'Failed to search students' });
   }
 });
+
 
 export default router;

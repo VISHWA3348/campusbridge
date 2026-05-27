@@ -113,7 +113,7 @@ export default function StudentDashboard() {
             ></div>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Next Step: {data.readiness?.suggestions?.[0]?.substring(0, 20) || 'Complete your profile'}...</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Next Step: {(Array.isArray(data.readiness?.suggestions) && data.readiness.suggestions[0]) ? data.readiness.suggestions[0].substring(0, 20) : 'Complete your profile'}...</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
           </div>
         </Link>

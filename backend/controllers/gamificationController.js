@@ -64,7 +64,7 @@ export const getLeaderboard = async (req, res) => {
       photo: item.user.profilePhoto,
       role: item.user.role,
       points: item.points,
-      college: item.user.college.name,
+      college: item.user.college?.name || 'Unknown',
       company: item.user.alumni?.currentCompany,
       referrals: item.user.alumni?.referrals?.length || 0,
       skills: item.user.student?.skills

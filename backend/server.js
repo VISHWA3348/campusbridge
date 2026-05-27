@@ -22,7 +22,7 @@ import trackerRoutes from './routes/trackerRoutes.js';
 import recommendationRoutes from './routes/recommendationRoutes.js';
 import verificationRoutes from './routes/verificationRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
-import prisma, { connectWithRetry, databaseUrl } from './prisma/db.js';
+import prisma, { connectWithRetry } from './prisma/db.js';
 import { authenticate } from './middleware/auth.js';
 import { getNotifications, markAsRead, deleteNotification, clearAllNotifications, getNotificationSettings, updateNotificationSettings } from './controllers/notificationController.js';
 import { checkFeature } from './middleware/feature.js';
@@ -196,9 +196,6 @@ app.get('/api/debug/env-check', (req, res) => {
     nodeEnv: process.env.NODE_ENV || 'not set',
     port: process.env.PORT || 'not set',
     dbUrlSet: !!process.env.DATABASE_URL,
-    dbUrlMasked: process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:([^@:]*)@/, ':****@') : 'undefined',
-    dbUrlSanitizedMasked: databaseUrl ? databaseUrl.replace(/:([^@:]*)@/, ':****@') : 'undefined',
-    buildVersion: "v4",
     timestamp: new Date().toISOString()
   });
 });

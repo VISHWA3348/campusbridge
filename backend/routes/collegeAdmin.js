@@ -28,31 +28,46 @@ router.post('/verifications/approve/:userId', approveUser);
 router.post('/verifications/reject/:userId', rejectUser);
 
 router.get('/students', async (req, res) => {
-  const students = await prisma.student.findMany({
-    where: { user: { collegeId: req.user.collegeId } },
-    include: { user: true }
-  });
-  res.json(students);
+  try {
+    const students = await prisma.student.findMany({
+      where: { user: { collegeId: req.user.collegeId } },
+      include: { user: true }
+    });
+    res.json(students);
+  } catch (error) {
+    console.error('Fetch students error:', error);
+    res.status(500).json({ error: 'Failed to fetch students' });
+  }
 });
 
 router.delete('/students/:id', async (req, res) => {
-  await prisma.student.delete({ where: { id: parseInt(req.params.id) } });
-  res.json({ success: true });
+  try {
+    await prisma.student.delete({ where: { id: parseInt(req.params.id) } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete student error:', error);
+    res.status(500).json({ error: 'Failed to delete student' });
+  }
 });
 
 router.get('/alumni', async (req, res) => {
-  const alumni = await prisma.alumni.findMany({
-    where: { user: { collegeId: req.user.collegeId } },
-    include: { 
-      user: {
-        include: {
-          college: true,
-          inviteCodeUsed: true
-        }
-      } 
-    }
-  });
-  res.json(alumni);
+  try {
+    const alumni = await prisma.alumni.findMany({
+      where: { user: { collegeId: req.user.collegeId } },
+      include: { 
+        user: {
+          include: {
+            college: true,
+            inviteCodeUsed: true
+          }
+        } 
+      }
+    });
+    res.json(alumni);
+  } catch (error) {
+    console.error('Fetch alumni error:', error);
+    res.status(500).json({ error: 'Failed to fetch alumni' });
+  }
 });
 
 router.post('/alumni/:id/verify', async (req, res) => {
@@ -139,30 +154,46 @@ router.get('/placements/stats', async (req, res) => {
 });
 
 router.get('/webinars', async (req, res) => {
-  const webinars = await prisma.webinar.findMany({
-    where: { alumni: { user: { collegeId: req.user.collegeId } } },
-    include: { 
-      alumni: { include: { user: true } },
-      _count: { select: { registrations: true } }
-    }
-  });
-  res.json(webinars);
+  try {
+    const webinars = await prisma.webinar.findMany({
+      where: { alumni: { user: { collegeId: req.user.collegeId } } },
+      include: { 
+        alumni: { include: { user: true } },
+        _count: { select: { registrations: true } }
+      }
+    });
+    res.json(webinars);
+  } catch (error) {
+    console.error('Fetch webinars error:', error);
+    res.status(500).json({ error: 'Failed to fetch webinars' });
+  }
 });
 
 router.get('/referrals', async (req, res) => {
-  const referrals = await prisma.referral.findMany({
-    where: { student: { user: { collegeId: req.user.collegeId } } },
-    include: { student: { include: { user: true } }, alumni: { include: { user: true } } }
-  });
-  res.json(referrals);
+  try {
+    const referrals = await prisma.referral.findMany({
+      where: { student: { user: { collegeId: req.user.collegeId } } },
+      include: { student: { include: { user: true } }, alumni: { include: { user: true } } }
+    });
+    res.json(referrals);
+  } catch (error) {
+    console.error('Fetch referrals error:', error);
+    res.status(500).json({ error: 'Failed to fetch referrals' });
+  }
 });
 
 router.get('/:id', async (req, res) => {
-  const college = await prisma.college.findUnique({
-    where: { id: parseInt(req.params.id) },
-    include: { _count: { select: { users: true } } }
-  });
-  res.json(college);
+  try {
+    const college = await prisma.college.findUnique({
+      where: { id: parseInt(req.params.id) },
+      include: { _count: { select: { users: true } } }
+    });
+    if (!college) return res.status(404).json({ error: 'College not found' });
+    res.json(college);
+  } catch (error) {
+    console.error('Fetch college error:', error);
+    res.status(500).json({ error: 'Failed to fetch college' });
+  }
 });
 
 router.put('/:id/settings', async (req, res) => {

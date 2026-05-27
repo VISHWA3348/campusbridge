@@ -145,6 +145,19 @@ export const getMentorshipAnalytics = async (req, res) => {
       }
     });
 
+    if (!alumni) {
+      return res.json({
+        totalSessions: 0,
+        completedSessions: 0,
+        pendingRequests: 0,
+        studentsMentored: 0,
+        impactScore: 0,
+        xp: 0,
+        rating: 0
+      });
+    }
+
+    const ratedRequests = alumni.mentorshipRequests.filter(r => r.rating);
     const stats = {
       totalSessions: alumni.mentorshipRequests.length,
       completedSessions: alumni.mentorshipRequests.filter(r => r.status === 'completed').length,
@@ -152,11 +165,14 @@ export const getMentorshipAnalytics = async (req, res) => {
       studentsMentored: new Set(alumni.mentorshipRequests.map(r => r.studentId)).size,
       impactScore: alumni.mentorshipImpactScore,
       xp: alumni.mentorshipXP,
-      rating: alumni.mentorshipRequests.filter(r => r.rating).reduce((acc, r) => acc + r.rating, 0) / (alumni.mentorshipRequests.filter(r => r.rating).length || 1)
+      rating: ratedRequests.length > 0
+        ? ratedRequests.reduce((acc, r) => acc + r.rating, 0) / ratedRequests.length
+        : 0
     };
 
     res.json(stats);
   } catch (error) {
+    console.error('Mentorship analytics error:', error);
     res.status(500).json({ error: 'Failed to fetch analytics' });
   }
 };

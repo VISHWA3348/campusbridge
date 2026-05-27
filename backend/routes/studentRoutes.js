@@ -9,17 +9,27 @@ const router = express.Router();
 router.use(authenticate);
 
 router.get('/profile', async (req, res) => {
-  const profile = await prisma.user.findUnique({
-    where: { id: req.user.userId },
-    include: { student: true, college: true }
-  });
-  res.json({
-    ...profile.student,
-    name: profile.name,
-    email: profile.email,
-    college: profile.college
-  });
+  try {
+    const profile = await prisma.user.findUnique({
+      where: { id: req.user.userId },
+      include: { student: true, college: true }
+    });
+    if (!profile) return res.status(404).json({ error: 'User not found' });
+    if (!profile.student) return res.status(404).json({ error: 'Student profile not found' });
+    res.json({
+      ...profile.student,
+      name: profile.name,
+      email: profile.email,
+      college: profile.college,
+      profilePhoto: profile.profilePhoto,
+      bio: profile.bio
+    });
+  } catch (error) {
+    console.error('Student profile error:', error);
+    res.status(500).json({ error: 'Failed to fetch student profile' });
+  }
 });
+
 
 router.put('/settings', async (req, res) => {
   const { name, department, rollNumber, currentYear, totalStudents, fullDetails } = req.body;
