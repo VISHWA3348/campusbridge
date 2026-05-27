@@ -1,5 +1,7 @@
 import prisma from '../prisma/db.js';
 import { createNotification } from '../utils/notification.js';
+import bcrypt from 'bcryptjs';
+
 
 export const getSuperAdminAnalytics = async (req, res) => {
   try {
@@ -334,11 +336,12 @@ export const getCollegeAdminAnalytics = async (req, res) => {
 export const createUser = async (req, res) => {
   const { name, email, password, role, collegeId, ...extraData } = req.body;
   try {
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
     const user = await prisma.user.create({
       data: {
         name,
         email,
-        password, // Should be hashed in real scenario, but keeping it simple for now if that's the pattern
+        password: hashedPassword,
         role,
         collegeId: parseInt(collegeId),
         isVerified: true

@@ -196,6 +196,7 @@ app.get('/api/debug/env-check', (req, res) => {
     nodeEnv: process.env.NODE_ENV || 'not set',
     port: process.env.PORT || 'not set',
     dbUrlSet: !!process.env.DATABASE_URL,
+    dbUrlMasked: process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:([^@:]*)@/, ':****@') : 'undefined',
     timestamp: new Date().toISOString()
   });
 });
