@@ -57,6 +57,6 @@ async function connectWithRetry(retries = 5, delay = 2000) {
   throw new Error('Could not connect to database after multiple retries.');
 }
 
-export { connectWithRetry };
+export { connectWithRetry, databaseUrl };
 export default prisma;
 
