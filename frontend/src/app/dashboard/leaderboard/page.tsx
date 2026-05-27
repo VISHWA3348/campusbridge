@@ -53,16 +53,17 @@ export default function HonorBoardPage() {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();
-      setLeaderboard(data);
+      setLeaderboard(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
+      setLeaderboard([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const topThree = leaderboard.slice(0, 3);
-  const remaining = leaderboard.slice(3);
+  const topThree = Array.isArray(leaderboard) ? leaderboard.slice(0, 3) : [];
+  const remaining = Array.isArray(leaderboard) ? leaderboard.slice(3) : [];
 
   return (
     <DashboardLayout>
@@ -155,25 +156,25 @@ export default function HonorBoardPage() {
                   </thead>
                   <tbody className="divide-y divide-slate-50">
                     {remaining.map((entry) => (
-                      <tr key={entry.id} className="hover:bg-slate-50/50 transition-colors group">
+                      <tr key={entry?.id} className="hover:bg-slate-50/50 transition-colors group">
                         <td className="px-10 py-8">
                           <span className="w-10 h-10 bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center font-black text-sm group-hover:bg-slate-900 group-hover:text-white transition-all">
-                            {entry.rank}
+                            {entry?.rank}
                           </span>
                         </td>
                         <td className="px-10 py-8">
                           <button
-                            onClick={() => router.push(`/dashboard/profile/${entry.id}`)}
+                            onClick={() => router.push(`/dashboard/profile/${entry?.id}`)}
                             className="flex items-center gap-4 text-left group/profile"
                           >
                             <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 border-2 border-white shadow-sm">
-                              {entry.photo ? (
+                              {entry?.photo ? (
                                 <img src={getFileUrl(entry.photo) || ''} className="w-full h-full object-cover" />
-                              ) : <div className="w-full h-full flex items-center justify-center font-black text-xl text-slate-300">{entry.name[0]}</div>}
+                              ) : <div className="w-full h-full flex items-center justify-center font-black text-xl text-slate-300">{entry?.name ? entry.name[0] : '?'}</div>}
                             </div>
                             <div>
-                              <p className="font-black text-slate-900 group-hover/profile:text-indigo-600 transition-colors">{entry.name}</p>
-                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{entry.college}</p>
+                              <p className="font-black text-slate-900 group-hover/profile:text-indigo-600 transition-colors">{entry?.name || 'Anonymous'}</p>
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{entry?.college || 'Institution'}</p>
                             </div>
                           </button>
                         </td>
@@ -183,20 +184,20 @@ export default function HonorBoardPage() {
                               <>
                                 <div>
                                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Referrals</p>
-                                  <p className="text-sm font-black text-slate-900">{entry.referrals} Accepted</p>
+                                  <p className="text-sm font-black text-slate-900">{entry?.referrals || 0} Accepted</p>
                                 </div>
                                 <div>
                                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Company</p>
-                                  <p className="text-sm font-black text-slate-900">{entry.company || 'Professional'}</p>
+                                  <p className="text-sm font-black text-slate-900">{entry?.company || 'Professional'}</p>
                                 </div>
                               </>
                             ) : (
                               <div>
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Expertise</p>
                                 <div className="flex gap-1">
-                                  {entry.skills?.split(',').slice(0, 2).map((s: any, i: number) => (
+                                  {entry?.skills?.split(',').slice(0, 2).map((s: any, i: number) => (
                                     <span key={i} className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-md text-[9px] font-black uppercase">{s.trim()}</span>
-                                  ))}
+                                  )) || <span className="text-[9px] font-bold text-slate-400 italic">No skills listed</span>}
                                 </div>
                               </div>
                             )}
@@ -205,7 +206,7 @@ export default function HonorBoardPage() {
                         <td className="px-10 py-8 text-right">
                           <div className="inline-flex items-center gap-3 bg-slate-900 text-white px-5 py-2.5 rounded-2xl shadow-xl shadow-slate-200">
                             <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
-                            <span className="font-black text-sm">{entry.points.toLocaleString()} XP</span>
+                            <span className="font-black text-sm">{(entry?.points || 0).toLocaleString()} XP</span>
                           </div>
                         </td>
                       </tr>
@@ -238,9 +239,9 @@ function PodiumItem({ entry, rank, color }: { entry: any, rank: number, color: s
         {rank === 1 && <Crown className="absolute -top-10 left-1/2 -translate-x-1/2 w-12 h-12 text-amber-400 drop-shadow-lg" />}
         <div className={`w-32 h-32 rounded-[2.5rem] p-1.5 ${isFirst ? 'bg-gradient-to-tr from-amber-200 via-amber-400 to-amber-200 shadow-2xl' : 'bg-slate-100'}`}>
           <div className="w-full h-full rounded-[2.2rem] overflow-hidden bg-white relative">
-            {entry.photo ? (
+            {entry?.photo ? (
               <img src={getFileUrl(entry.photo) || ''} className="w-full h-full object-cover" />
-            ) : <div className="w-full h-full flex items-center justify-center font-black text-4xl text-slate-200">{entry.name[0]}</div>}
+            ) : <div className="w-full h-full flex items-center justify-center font-black text-4xl text-slate-200">{entry?.name ? entry.name[0] : '?'}</div>}
           </div>
         </div>
         <div className={`absolute -bottom-4 -right-4 w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl shadow-xl ${rank === 1 ? 'bg-amber-400 text-slate-900' : 'bg-slate-900 text-white'
@@ -250,22 +251,22 @@ function PodiumItem({ entry, rank, color }: { entry: any, rank: number, color: s
       </div>
 
       <div className="text-center mb-8">
-        <h3 className="text-2xl font-black mb-1 truncate max-w-[180px]">{entry.name}</h3>
+        <h3 className="text-2xl font-black mb-1 truncate max-w-[180px]">{entry?.name || 'Anonymous'}</h3>
         <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${isFirst ? 'text-slate-400' : 'text-slate-500'}`}>
-          {entry.role} • {entry.college}
+          {entry?.role || 'User'} • {entry?.college || 'Institution'}
         </p>
       </div>
 
       <div className={`w-full p-6 rounded-[2rem] flex flex-col items-center gap-3 ${isFirst ? 'bg-white/10' : 'bg-slate-50'}`}>
         <div className="flex items-center gap-2">
           <Zap className={`w-5 h-5 ${isFirst ? 'text-amber-400' : 'text-slate-400'}`} />
-          <span className="text-3xl font-black">{entry.points.toLocaleString()}</span>
+          <span className="text-3xl font-black">{(entry?.points || 0).toLocaleString()}</span>
         </div>
         <p className={`text-[10px] font-black uppercase tracking-widest ${isFirst ? 'text-slate-400' : 'text-slate-400'}`}>System Impact Points</p>
       </div>
 
       <button
-        onClick={() => router.push(`/dashboard/profile/${entry.id}`)}
+        onClick={() => entry?.id && router.push(`/dashboard/profile/${entry.id}`)}
         className={`mt-8 w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${isFirst ? 'bg-white text-slate-900 hover:bg-amber-400 hover:text-slate-900' : 'bg-slate-900 text-white hover:bg-indigo-600'
           }`}>
         View Achievements <ChevronRight className="w-4 h-4" />

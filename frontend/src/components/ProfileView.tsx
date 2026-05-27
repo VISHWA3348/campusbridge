@@ -40,7 +40,20 @@ export default function ProfileView({ data }: ProfileViewProps) {
   const router = useRouter();
   const { user: currentUser } = useAuth();
   
-  if (!data) return <div className="p-8 text-center text-slate-500 font-bold">No profile data found.</div>;
+  if (!data || data.error) {
+    return (
+      <div className="p-12 text-center bg-white border border-slate-100 rounded-[2.5rem] shadow-sm max-w-xl mx-auto my-12">
+        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <XCircle className="w-8 h-8" />
+        </div>
+        <h2 className="text-2xl font-black text-slate-900 mb-2">Failed to Load Profile</h2>
+        <p className="text-slate-500 font-medium mb-6">{data?.error || 'The profile details could not be retrieved.'}</p>
+        <button onClick={() => window.location.reload()} className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-md">
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   const isStudent = data.role === 'STUDENT';
   const isAlumni = data.role === 'ALUMNI';
@@ -48,8 +61,10 @@ export default function ProfileView({ data }: ProfileViewProps) {
 
   const handleStartChat = () => {
     if (!currentUser) return router.push('/login');
-    const rolePath = currentUser.role.toLowerCase().replace('_', '-');
-    router.push(`/dashboard/${rolePath}/chat?userId=${data.id}`);
+    const rolePath = currentUser.role?.toLowerCase()?.replace('_', '-');
+    if (rolePath) {
+      router.push(`/dashboard/${rolePath}/chat?userId=${data.id}`);
+    }
   };
 
   return (
@@ -78,7 +93,7 @@ export default function ProfileView({ data }: ProfileViewProps) {
           <div className="flex-1 text-center md:text-left pt-4">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-6">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-sm">
-                {data.role.replace('_', ' ')}
+                {(data.role || '').replace('_', ' ')}
               </div>
               {data.verificationStatus === 'APPROVED' && (
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-sm">

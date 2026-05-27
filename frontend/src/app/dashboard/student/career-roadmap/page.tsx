@@ -26,6 +26,16 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const parseJsonSafely = (data: any, fallback: any = []) => {
+  if (!data) return fallback;
+  if (typeof data === 'object') return fallback; // In case already parsed
+  try {
+    return JSON.parse(data);
+  } catch (e) {
+    return fallback;
+  }
+};
+
 export default function CareerRoadmapPage() {
   const [data, setData] = useState<any>({ userRoadmaps: [] });
   const [loading, setLoading] = useState(true);
@@ -70,7 +80,7 @@ export default function CareerRoadmapPage() {
 
   const toggleStep = async (stepId: string) => {
     if (!selectedRoadmap) return;
-    const completedSteps = JSON.parse(selectedRoadmap.completedSteps || "[]");
+    const completedSteps = parseJsonSafely(selectedRoadmap.completedSteps, []);
     const isCompleted = completedSteps.includes(stepId);
     
     try {
@@ -89,11 +99,14 @@ export default function CareerRoadmapPage() {
     }
   };
 
-  const roadmapSteps = selectedRoadmap ? JSON.parse(selectedRoadmap.steps || "[]") : [];
-  const detailedData = selectedRoadmap?.detailedData ? JSON.parse(selectedRoadmap.detailedData) : null;
-  const completedCount = selectedRoadmap ? JSON.parse(selectedRoadmap.completedSteps || "[]").length : 0;
+  const completedStepsList = selectedRoadmap ? parseJsonSafely(selectedRoadmap.completedSteps, []) : [];
+  const roadmapSteps = selectedRoadmap ? parseJsonSafely(selectedRoadmap.steps, []) : [];
+  const detailedData = selectedRoadmap?.detailedData ? parseJsonSafely(selectedRoadmap.detailedData, null) : null;
+  const completedCount = completedStepsList.length;
 
-  const currentLevelData = detailedData?.levels ? detailedData.levels[activeLevel] : null;
+  const currentLevelData = detailedData?.levels 
+    ? (detailedData.levels[activeLevel] || detailedData.levels[activeLevel.charAt(0).toUpperCase() + activeLevel.slice(1)])
+    : null;
 
   return (
     <DashboardLayout>
@@ -265,7 +278,7 @@ export default function CareerRoadmapPage() {
                     <MessageSquare className="w-4 h-4 text-indigo-200" /> AI MENTOR TIP
                   </h3>
                   <p className="text-sm font-bold leading-relaxed text-indigo-50 italic">
-                    "Focus on {currentLevelData.skills[0]} and {currentLevelData.skills[1]} first. This creates a strong foundation for {selectedRoadmap.title}."
+                    "Focus on " + (currentLevelData.skills?.[0] || 'core concepts') + " and " + (currentLevelData.skills?.[1] || 'advanced skills') + " first. This creates a strong foundation for " + selectedRoadmap.title + "."
                   </p>
                 </motion.div>
               )}
@@ -359,8 +372,8 @@ export default function CareerRoadmapPage() {
                   <div className="absolute left-10 top-0 bottom-0 w-1 bg-slate-100 rounded-full"></div>
                   
                   {roadmapSteps.map((step: any, idx: number) => {
-                    const isCompleted = JSON.parse(selectedRoadmap.completedSteps || "[]").includes(step.id);
-                    const isNext = !isCompleted && (idx === 0 || JSON.parse(selectedRoadmap.completedSteps || "[]").includes(roadmapSteps[idx-1].id));
+                    const isCompleted = completedStepsList.includes(step.id);
+                    const isNext = !isCompleted && (idx === 0 || completedStepsList.includes(roadmapSteps[idx-1].id));
                     
                     return (
                       <motion.div 

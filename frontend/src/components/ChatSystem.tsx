@@ -112,8 +112,9 @@ export default function ChatSystem() {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();
-      setConversations(data);
-      return data;
+      const conversationsList = Array.isArray(data) ? data : [];
+      setConversations(conversationsList);
+      return conversationsList;
     } catch (error) {
       console.error('Error fetching conversations:', error);
       return [];
@@ -293,9 +294,9 @@ export default function ChatSystem() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const filteredConversations = conversations.filter(conv =>
+  const filteredConversations = Array.isArray(conversations) ? conversations.filter(conv =>
     conv.user?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ) : [];
 
   return (
     <div className="h-[calc(100vh-140px)] bg-white rounded-[2.5rem] border border-slate-100 shadow-sm flex overflow-hidden relative">

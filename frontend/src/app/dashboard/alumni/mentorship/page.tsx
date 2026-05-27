@@ -41,8 +41,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AlumniMentorship() {
-  const [requests, setRequests] = useState([]);
-  const [slots, setSlots] = useState([]);
+  const [requests, setRequests] = useState<any[]>([]);
+  const [slots, setSlots] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -60,20 +60,32 @@ export default function AlumniMentorship() {
   const loadData = async () => {
     try {
       const [reqs, slts, stats, prof] = await Promise.all([
-        fetchMentorshipRequests(),
-        fetchOwnSlots(),
-        fetchMentorshipAnalytics(),
-        fetchAlumniProfile()
+        fetchMentorshipRequests().catch(err => { console.error(err); return []; }),
+        fetchOwnSlots().catch(err => { console.error(err); return []; }),
+        fetchMentorshipAnalytics().catch(err => { console.error(err); return null; }),
+        fetchAlumniProfile().catch(err => { console.error(err); return null; })
       ]);
-      setRequests(reqs);
-      setSlots(slts);
-      setAnalytics(stats);
-      setProfile(prof);
-      if (prof?.mentorshipExpertise) {
-        setExpertise(JSON.parse(prof.mentorshipExpertise));
+      setRequests(Array.isArray(reqs) ? reqs : []);
+      setSlots(Array.isArray(slts) ? slts : []);
+      setAnalytics(stats && !stats.error ? stats : null);
+      setProfile(prof && !prof.error ? prof : null);
+      if (prof && !prof.error && prof.mentorshipExpertise) {
+        try {
+          setExpertise(JSON.parse(prof.mentorshipExpertise));
+        } catch (e) {
+          console.error("Failed to parse mentorshipExpertise:", e);
+          setExpertise([]);
+        }
+      } else {
+        setExpertise([]);
       }
     } catch (err) {
       console.error(err);
+      setRequests([]);
+      setSlots([]);
+      setAnalytics(null);
+      setProfile(null);
+      setExpertise([]);
     } finally {
       setLoading(false);
     }

@@ -151,8 +151,8 @@ export default function AlumniWebinarsPage() {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center -space-x-4 mr-4">
                       {webinar.registrations?.slice(0, 3).map((reg: any, i: number) => (
-                        <div key={i} className="w-10 h-10 rounded-full border-4 border-white bg-slate-200 flex items-center justify-center text-[10px] font-black" title={reg.student.user.name}>
-                          {reg.student.user.name[0]}
+                        <div key={i} className="w-10 h-10 rounded-full border-4 border-white bg-slate-200 flex items-center justify-center text-[10px] font-black" title={reg.student?.user?.name || 'Anonymous'}>
+                          {reg.student?.user?.name?.[0] || '?'}
                         </div>
                       ))}
                       {webinar._count?.registrations > 3 && (

@@ -10,10 +10,17 @@ export default function WebinarsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCollegeWebinars().then(data => {
-      setWebinars(data);
-      setLoading(false);
-    });
+    fetchCollegeWebinars()
+      .then(data => {
+        setWebinars(Array.isArray(data) ? data : []);
+      })
+      .catch(err => {
+        console.error("Failed to fetch college webinars:", err);
+        setWebinars([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   return (

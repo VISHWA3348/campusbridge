@@ -21,7 +21,7 @@ import Link from 'next/link';
 
 export default function StudentSearchPage() {
   const { token, user } = useAuth();
-  const [students, setStudents] = useState([]);
+  const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
@@ -44,9 +44,10 @@ export default function StudentSearchPage() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      setStudents(data);
+      setStudents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching students:', err);
+      setStudents([]);
     } finally {
       setLoading(false);
     }
