@@ -12,5 +12,6 @@ const getJWTSecret = () => {
   return secret;
 };
 
-export const JWT_SECRET = getJWTSecret();
-export default JWT_SECRET;
+export const JWT_SECRET = getJWTSecret(); // Kept for backward compatibility if any file still references the constant
+export default getJWTSecret;
+

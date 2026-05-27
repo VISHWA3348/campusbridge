@@ -2,6 +2,7 @@ import prisma from '../prisma/db.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
+import getJWTSecret from '../utils/jwtConfig.js';
 import { createNotification } from '../utils/notification.js';
 import { sendVerificationEmail, sendOTPEmail, sendPasswordResetEmail, sendWelcomeEmail } from '../services/emailService.js';
 import { OAuth2Client } from 'google-auth-library';
@@ -166,7 +167,7 @@ export const login = async (req, res) => {
 
     const token = jwt.sign(
       { userId: user.id, role: user.role, collegeId: user.collegeId },
-      process.env.JWT_SECRET || 'Vishwa@8105',
+      getJWTSecret(),
       { expiresIn: '7d' }
     );
 
@@ -530,7 +531,7 @@ export const googleLogin = async (req, res) => {
     // Generate standard JWT token
     const token = jwt.sign(
       { userId: user.id, role: user.role, collegeId: user.collegeId },
-      process.env.JWT_SECRET || 'Vishwa@8105',
+      getJWTSecret(),
       { expiresIn: '7d' }
     );
 

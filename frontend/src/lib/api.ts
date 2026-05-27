@@ -8,6 +8,28 @@ const getHeaders = () => {
   };
 };
 
+const handleResponse = async (res: Response, url: string) => {
+  if (res.status === 401 || res.status === 403) {
+    if (!url.endsWith('/auth/login') && !url.endsWith('/auth/google-login')) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        if (!window.location.pathname.startsWith('/login')) {
+          window.location.href = '/login?expired=true';
+        }
+      }
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'Session expired. Please login again.');
+    }
+  }
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error || `Request failed with status ${res.status}`);
+  }
+  return data;
+};
+
 // --- Auth ---
 export async function login(credentials: any) {
   const res = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -535,7 +557,7 @@ export async function fetchSuperAdminProfile() {
 
 export async function fetchColleges() {
   const res = await fetch(`${API_BASE_URL}/admin/colleges`, { headers: getHeaders() });
-  const data = await res.json();
+  const data = await handleResponse(res, `${API_BASE_URL}/admin/colleges`);
   // Handle both array and paginated {colleges: [], total} response formats
   if (Array.isArray(data)) return data;
   if (data && Array.isArray(data.colleges)) return data.colleges;
@@ -544,7 +566,7 @@ export async function fetchColleges() {
 
 export async function fetchCollegeById(id: number) {
   const res = await fetch(`${API_BASE_URL}/admin/colleges/${id}`, { headers: getHeaders() });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/colleges/${id}`);
 }
 
 export async function createCollege(data: any) {
@@ -553,7 +575,7 @@ export async function createCollege(data: any) {
     headers: getHeaders(),
     body: JSON.stringify(data)
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/colleges`);
 }
 
 export async function updateCollege(id: number, data: any) {
@@ -562,7 +584,7 @@ export async function updateCollege(id: number, data: any) {
     headers: getHeaders(),
     body: JSON.stringify(data)
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/colleges/${id}`);
 }
 
 export async function deleteCollege(id: number) {
@@ -570,7 +592,7 @@ export async function deleteCollege(id: number) {
     method: 'DELETE',
     headers: getHeaders()
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/colleges/${id}`);
 }
 
 export async function toggleCollegeStatus(id: number) {
@@ -578,13 +600,13 @@ export async function toggleCollegeStatus(id: number) {
     method: 'PATCH',
     headers: getHeaders()
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/colleges/${id}/toggle-status`);
 }
 
 // --- Departments ---
 export async function fetchDepartments() {
   const res = await fetch(`${API_BASE_URL}/admin/departments`, { headers: getHeaders() });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/departments`);
 }
 
 export async function createDepartment(data: any) {
@@ -593,7 +615,7 @@ export async function createDepartment(data: any) {
     headers: getHeaders(),
     body: JSON.stringify(data)
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/departments`);
 }
 
 export async function updateDepartment(id: number, data: any) {
@@ -602,7 +624,7 @@ export async function updateDepartment(id: number, data: any) {
     headers: getHeaders(),
     body: JSON.stringify(data)
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/departments/${id}`);
 }
 
 export async function deleteDepartment(id: number) {
@@ -610,7 +632,7 @@ export async function deleteDepartment(id: number) {
     method: 'DELETE',
     headers: getHeaders()
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/departments/${id}`);
 }
 
 export async function toggleDepartmentStatus(id: number) {
@@ -618,7 +640,7 @@ export async function toggleDepartmentStatus(id: number) {
     method: 'PATCH',
     headers: getHeaders()
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/departments/${id}/toggle-status`);
 }
 
 export async function fetchUsers() {

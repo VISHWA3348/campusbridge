@@ -1,9 +1,10 @@
 import jwt from 'jsonwebtoken';
 import prisma from '../prisma/db.js';
+import getJWTSecret from '../utils/jwtConfig.js';
 
 // Use the same JWT_SECRET resolution logic as authController
 // Priority: process.env.JWT_SECRET (set at runtime after dotenv.config()) > fallback
-const getSecret = () => process.env.JWT_SECRET || 'Vishwa@8105';
+const getSecret = () => getJWTSecret();
 
 export const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
