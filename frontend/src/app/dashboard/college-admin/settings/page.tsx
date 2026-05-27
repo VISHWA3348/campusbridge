@@ -23,7 +23,7 @@ export default function CollegeAdminSettings() {
   useEffect(() => {
     if (user) {
       // Fetch user profile for personal details
-      fetch(`${(typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))}/profile/me`, {
+      fetch(`${(typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))}/profile/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => res.json())
@@ -49,7 +49,7 @@ export default function CollegeAdminSettings() {
 
     try {
       // Update personal profile
-      const profileRes = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))) + '/profile/me', {
+      const profileRes = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/profile/me', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ export default function CollegeAdminSettings() {
   const handlePhotoUpload = async (file: File) => {
     const fd = new FormData();
     fd.append('photo', file);
-    const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))) + '/profile/photo', {
+    const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/profile/photo', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
       body: fd
@@ -83,7 +83,7 @@ export default function CollegeAdminSettings() {
   };
 
   const handlePhotoRemove = async () => {
-    const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))) + '/profile/photo', {
+    const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/profile/photo', {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });

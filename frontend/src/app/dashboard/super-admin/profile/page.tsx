@@ -13,7 +13,7 @@ const API_BASE = typeof window !== 'undefined' &&
   ? 'https://campusbridge-e4cv.onrender.com/api'
   : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' 
     ? process.env.NEXT_PUBLIC_API_URL 
-    : 'https://campusbridge-e4cv.onrender.com/api');
+    : 'http://localhost:5000/api');
 
 /** Check if a JWT token is expired client-side */
 function isTokenExpired(token: string): boolean {

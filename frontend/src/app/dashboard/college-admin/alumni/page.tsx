@@ -35,7 +35,7 @@ export default function CollegeAlumniPage() {
     setActionLoading(userId);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${(typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))}/college/verifications/approve/${userId}`, {
+      const res = await fetch(`${(typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))}/college/verifications/approve/${userId}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -55,7 +55,7 @@ export default function CollegeAlumniPage() {
     setActionLoading(selectedAlumni.user.id);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${(typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))}/college/verifications/reject/${selectedAlumni.user.id}`, {
+      const res = await fetch(`${(typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))}/college/verifications/reject/${selectedAlumni.user.id}`, {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${token}`,

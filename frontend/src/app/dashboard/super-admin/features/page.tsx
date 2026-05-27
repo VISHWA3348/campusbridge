@@ -13,9 +13,10 @@ export default function FeaturesPage() {
   const fetchFeatures = async () => {
     try {
       const data = await fetchFeaturesApi();
-      setFeatures(data);
+      setFeatures(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching features:', error);
+      setFeatures([]);
     } finally {
       setLoading(false);
     }

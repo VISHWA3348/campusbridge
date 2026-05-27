@@ -534,17 +534,17 @@ export async function fetchCollegeReferrals() {
 // --- Super Admin APIs ---
 export async function fetchAdminOverview() {
   const res = await fetch(`${API_BASE_URL}/admin/analytics/overview`, { headers: getHeaders() });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/analytics/overview`);
 }
 
 export async function fetchAdminPlacements() {
   const res = await fetch(`${API_BASE_URL}/admin/placements`, { headers: getHeaders() });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/placements`);
 }
 
 export async function fetchAdminPlacementStats() {
   const res = await fetch(`${API_BASE_URL}/admin/placements/stats`, { headers: getHeaders() });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/placements/stats`);
 }
 
 export const fetchAdminStats = fetchAdminOverview;
@@ -552,7 +552,7 @@ export const fetchAdminStats = fetchAdminOverview;
 // Super Admin self-profile
 export async function fetchSuperAdminProfile() {
   const res = await fetch(`${API_BASE_URL}/admin/me`, { headers: getHeaders() });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/me`);
 }
 
 export async function fetchColleges() {
@@ -645,7 +645,7 @@ export async function toggleDepartmentStatus(id: number) {
 
 export async function fetchUsers() {
   const res = await fetch(`${API_BASE_URL}/admin/users`, { headers: getHeaders() });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/users`);
 }
 
 export async function createUser(data: any) {
@@ -654,7 +654,7 @@ export async function createUser(data: any) {
     headers: getHeaders(),
     body: JSON.stringify(data)
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/users`);
 }
 
 export async function updateUser(id: number, data: any) {
@@ -663,7 +663,7 @@ export async function updateUser(id: number, data: any) {
     headers: getHeaders(),
     body: JSON.stringify(data)
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/users/${id}`);
 }
 
 export async function deleteUser(id: number) {
@@ -671,7 +671,7 @@ export async function deleteUser(id: number) {
     method: 'DELETE',
     headers: getHeaders()
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/users/${id}`);
 }
 
 export async function toggleUserStatus(id: number) {
@@ -679,12 +679,12 @@ export async function toggleUserStatus(id: number) {
     method: 'PATCH',
     headers: getHeaders()
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/users/${id}/toggle-status`);
 }
 
 export async function fetchUserFullProfile(id: number) {
   const res = await fetch(`${API_BASE_URL}/admin/users/${id}/profile`, { headers: getHeaders() });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/users/${id}/profile`);
 }
 
 export async function fetchSubscriptions() {
@@ -739,7 +739,7 @@ export async function deletePlan(id: number) {
 
 export async function fetchFeatures() {
   const res = await fetch(`${API_BASE_URL}/admin/features`, { headers: getHeaders() });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/features`);
 }
 
 export async function toggleFeature(id: number) {
@@ -747,17 +747,17 @@ export async function toggleFeature(id: number) {
     method: 'POST',
     headers: getHeaders()
   });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/features/${id}/toggle`);
 }
 
 export async function fetchSystemHealth() {
   const res = await fetch(`${API_BASE_URL}/admin/system/health`, { headers: getHeaders() });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/system/health`);
 }
 
 export async function fetchAuditLogs() {
   const res = await fetch(`${API_BASE_URL}/admin/audit-logs`, { headers: getHeaders() });
-  return res.json();
+  return handleResponse(res, `${API_BASE_URL}/admin/audit-logs`);
 }
 
 // --- Gamification & Leaderboard ---
@@ -796,7 +796,7 @@ export async function fetchNotifications() {
 export function getFileUrl(url: string | null | undefined): string | null {
   if (!url) return null;
   if (url.startsWith('http')) return url;
-  const baseUrl = (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'));
+  const baseUrl = (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'));
   return `${baseUrl.replace(/\/api$/, '')}/${url}`;
 }
 
