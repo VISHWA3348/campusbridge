@@ -69,103 +69,114 @@ export const createCollege = async (req, res) => {
     const existing = await prisma.college.findUnique({ where: { collegeCode } });
     if (existing) return res.status(400).json({ error: 'College code already exists' });
 
-    // 1. Create College
-    const college = await prisma.college.create({
-      data: {
-        name, collegeCode, institutionType, universityName, 
-        isAutonomous: isAutonomous === 'true' || isAutonomous === true, 
-        establishmentYear,
-        country, state, city, address, pincode,
-        officialEmail, officialPhone, websiteUrl,
-        departments: departments || (departmentsData ? departmentsData.map(d => d.name).join(', ') : ''), 
-        totalDepartments: parseInt(totalDepartments) || (departmentsData ? departmentsData.length : 0),
-        studentCapacity: parseInt(studentCapacity) || 0,
-        placementCellAvailable: placementCellAvailable === 'true' || placementCellAvailable === true,
-        logo, logoPublicId, banner, bannerPublicId,
-        status: status || 'active',
-        studentLimit: parseInt(studentLimit) || 1000,
-        alumniLimit: parseInt(alumniLimit) || 1000,
-        inviteCode: inviteCode || `${name.substring(0, 3).toUpperCase()}-${new Date().getFullYear()}`,
-        inviteCodeStatus: inviteCodeStatus === 'true' || inviteCodeStatus === true
-      }
-    });
-
-    // 2. Create Departments if provided
-    if (departmentsData && Array.isArray(departmentsData)) {
-      for (const d of departmentsData) {
-        if (d.name && d.code) {
-          await prisma.department.create({
-            data: {
-              name: d.name,
-              code: d.code,
-              collegeId: college.id,
-              status: 'active'
-            }
-          });
-        }
-      }
+    // Check if administrator email already exists
+    if (adminEmail) {
+      const existingUser = await prisma.user.findUnique({ where: { email: adminEmail } });
+      if (existingUser) return res.status(400).json({ error: 'Administrator email already exists' });
     }
 
-    // 3. Create College Admin
-    const hashedPassword = await bcrypt.hash(adminPassword || '123456', 10);
-    const adminUser = await prisma.user.create({
-      data: {
-        name: adminName,
-        email: adminEmail,
-        password: hashedPassword,
-        role: 'COLLEGE_ADMIN',
-        collegeId: college.id,
-        isVerified: true
-      }
-    });
+    // Execute everything in a database transaction to ensure atomicity
+    const { college } = await prisma.$transaction(async (tx) => {
+      // 1. Create College
+      const college = await tx.college.create({
+        data: {
+          name, collegeCode, institutionType, universityName, 
+          isAutonomous: isAutonomous === 'true' || isAutonomous === true, 
+          establishmentYear,
+          country, state, city, address, pincode,
+          officialEmail, officialPhone, websiteUrl,
+          departments: departments || (departmentsData ? departmentsData.map(d => d.name).join(', ') : ''), 
+          totalDepartments: parseInt(totalDepartments) || (departmentsData ? departmentsData.length : 0),
+          studentCapacity: parseInt(studentCapacity) || 0,
+          placementCellAvailable: placementCellAvailable === 'true' || placementCellAvailable === true,
+          logo, logoPublicId, banner, bannerPublicId,
+          status: status || 'active',
+          studentLimit: parseInt(studentLimit) || 1000,
+          alumniLimit: parseInt(alumniLimit) || 1000,
+          inviteCode: inviteCode || `${(name || 'COL').substring(0, 3).toUpperCase()}-${new Date().getFullYear()}`,
+          inviteCodeStatus: inviteCodeStatus === 'true' || inviteCodeStatus === true
+        }
+      });
 
-    // 4. Generate Initial Signup Codes
-    const currentYear = new Date().getFullYear().toString();
-    
-    // a. General Student Code
-    await prisma.signupCode.create({
-      data: {
-        code: generateInviteCodeString(collegeCode, 'STUDENT', currentYear),
-        collegeId: college.id,
-        role: 'STUDENT',
-        batch: currentYear,
-        usageLimit: 1000,
-        status: 'ACTIVE',
-        createdBy: adminUser.id // Created by the new college admin or current super admin
-      }
-    });
-
-    // b. Department Specific Student Codes
-    if (departmentsData && Array.isArray(departmentsData)) {
-      for (const d of departmentsData) {
-        if (d.name && d.code) {
-          await prisma.signupCode.create({
-            data: {
-              code: generateInviteCodeString(collegeCode, d.code, currentYear),
-              collegeId: college.id,
-              departmentId: null, // We'll map by name for now as per current schema usage
-              departmentName: d.name,
-              role: 'STUDENT',
-              batch: currentYear,
-              usageLimit: 500,
-              status: 'ACTIVE',
-              createdBy: adminUser.id
-            }
-          });
+      // 2. Create Departments if provided
+      if (departmentsData && Array.isArray(departmentsData)) {
+        for (const d of departmentsData) {
+          if (d.name && d.code) {
+            await tx.department.create({
+              data: {
+                name: d.name,
+                code: d.code,
+                collegeId: college.id,
+                status: 'active'
+              }
+            });
+          }
         }
       }
-    }
 
-    // c. General Alumni Code
-    await prisma.signupCode.create({
-      data: {
-        code: generateInviteCodeString(collegeCode, 'ALUMNI', currentYear),
-        collegeId: college.id,
-        role: 'ALUMNI',
-        usageLimit: 2000,
-        status: 'ACTIVE',
-        createdBy: adminUser.id
+      // 3. Create College Admin
+      const hashedPassword = await bcrypt.hash(adminPassword || '123456', 10);
+      const adminUser = await tx.user.create({
+        data: {
+          name: adminName,
+          email: adminEmail,
+          password: hashedPassword,
+          role: 'COLLEGE_ADMIN',
+          collegeId: college.id,
+          isVerified: true
+        }
+      });
+
+      // 4. Generate Initial Signup Codes
+      const currentYear = new Date().getFullYear().toString();
+      
+      // a. General Student Code
+      await tx.signupCode.create({
+        data: {
+          code: generateInviteCodeString(collegeCode, 'STUDENT', currentYear),
+          collegeId: college.id,
+          role: 'STUDENT',
+          batch: currentYear,
+          usageLimit: 1000,
+          status: 'ACTIVE',
+          createdBy: adminUser.id // Created by the new college admin
+        }
+      });
+
+      // b. Department Specific Student Codes
+      if (departmentsData && Array.isArray(departmentsData)) {
+        for (const d of departmentsData) {
+          if (d.name && d.code) {
+            await tx.signupCode.create({
+              data: {
+                code: generateInviteCodeString(collegeCode, d.code, currentYear),
+                collegeId: college.id,
+                departmentId: null, // We'll map by name for now as per current schema usage
+                departmentName: d.name,
+                role: 'STUDENT',
+                batch: currentYear,
+                usageLimit: 500,
+                status: 'ACTIVE',
+                createdBy: adminUser.id
+              }
+            });
+          }
+        }
       }
+
+      // c. General Alumni Code
+      await tx.signupCode.create({
+        data: {
+          code: generateInviteCodeString(collegeCode, 'ALUMNI', currentYear),
+          collegeId: college.id,
+          role: 'ALUMNI',
+          usageLimit: 2000,
+          status: 'ACTIVE',
+          createdBy: adminUser.id
+        }
+      });
+
+      return { college };
     });
 
     res.json({ message: 'College, Departments, Admin and Secure Invite Codes created successfully', college });

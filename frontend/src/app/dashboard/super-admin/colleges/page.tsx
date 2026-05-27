@@ -146,9 +146,15 @@ export default function CollegesPage() {
     e.preventDefault();
     try {
       if (modalMode === 'add') {
-        await createCollege(formData);
+        const res = await createCollege(formData);
+        if (res && res.error) {
+          throw new Error(res.error);
+        }
       } else {
-        await updateCollege(selectedCollege.id, formData);
+        const res = await updateCollege(selectedCollege.id, formData);
+        if (res && res.error) {
+          throw new Error(res.error);
+        }
       }
       setShowModal(false);
       loadColleges();
