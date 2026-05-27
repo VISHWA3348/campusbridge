@@ -162,6 +162,10 @@ export const login = async (req, res) => {
       });
     }
 
+    if (!user.password || !user.password.startsWith('$2')) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
 
@@ -171,7 +175,18 @@ export const login = async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    const { password: _, ...safeUser } = user;
+    const { 
+      password: _, 
+      otp, 
+      otpExpiresAt, 
+      verificationToken, 
+      resetOtp, 
+      resetOtpExpiresAt, 
+      resetOtpVerified, 
+      lastResetRequest, 
+      resetAttempts,
+      ...safeUser 
+    } = user;
 
     res.json({
       message: 'Login successful',
@@ -535,7 +550,18 @@ export const googleLogin = async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    const { password: _, ...safeUser } = user;
+    const { 
+      password: _, 
+      otp, 
+      otpExpiresAt, 
+      verificationToken, 
+      resetOtp, 
+      resetOtpExpiresAt, 
+      resetOtpVerified, 
+      lastResetRequest, 
+      resetAttempts,
+      ...safeUser 
+    } = user;
 
     res.json({
       message: 'Google login successful',

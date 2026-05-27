@@ -34,7 +34,7 @@ function LoginForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: credentialResponse.credential })
       });
-      
+
       let data: any = {};
       const contentType = res.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
@@ -49,7 +49,7 @@ function LoginForm() {
         console.error('Server returned non-JSON response:', text.substring(0, 200));
         throw new Error('Server returned an invalid response. Please ensure the backend is running.');
       }
-      
+
       if (!res.ok) {
         if (data.status === 'PENDING_APPROVAL') {
           router.push('/auth/pending');
@@ -61,7 +61,7 @@ function LoginForm() {
         }
         throw new Error(data.error || 'Login failed. Please try again.');
       }
-      
+
       handleLoginSuccess(data);
     } catch (err: any) {
       setError(err.message || 'Google sign-in failed. Please try again.');
@@ -74,7 +74,7 @@ function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
+
     try {
       const baseUrl = (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'));
       const res = await fetch(baseUrl + '/auth/login', {
@@ -82,7 +82,7 @@ function LoginForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      
+
       let data: any = {};
       const contentType = res.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
@@ -97,7 +97,7 @@ function LoginForm() {
         console.error('Server returned non-JSON response:', text.substring(0, 200));
         throw new Error('Server returned an invalid response. Please ensure the backend is running.');
       }
-      
+
       if (!res.ok) {
         if (data.status === 'PENDING_APPROVAL') {
           router.push('/auth/pending');
@@ -109,7 +109,7 @@ function LoginForm() {
         }
         throw new Error(data.error || 'Login failed. Please try again.');
       }
-      
+
       handleLoginSuccess(data);
     } catch (err: any) {
       setError(err.message || 'An error occurred during login. Please try again.');
@@ -124,7 +124,7 @@ function LoginForm() {
         <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold mb-8 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Home
         </Link>
-        
+
         <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-slate-200 border border-slate-100">
           <div className="mb-10">
             <h1 className="text-3xl font-black text-slate-900 mb-2">Welcome Back</h1>
@@ -136,7 +136,7 @@ function LoginForm() {
               <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Email Address</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" />
-                <input 
+                <input
                   type="email" required
                   placeholder="name@example.com"
                   className="w-full pl-12 pr-6 py-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-indigo-500 focus:bg-white outline-none transition-all font-medium"
@@ -150,7 +150,7 @@ function LoginForm() {
               <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Password</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" />
-                <input 
+                <input
                   type="password" required
                   placeholder="••••••••"
                   className="w-full pl-12 pr-6 py-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-indigo-500 focus:bg-white outline-none transition-all font-medium"
@@ -161,7 +161,7 @@ function LoginForm() {
             </div>
 
             <div className="flex justify-end">
-               <Link href="/forgot-password" className="text-xs font-black text-indigo-600 hover:underline">Forgot password?</Link>
+              <Link href="/forgot-password" className="text-xs font-black text-indigo-600 hover:underline">Forgot password?</Link>
             </div>
 
             {error && (
@@ -170,7 +170,7 @@ function LoginForm() {
               </div>
             )}
 
-            <button 
+            <button
               disabled={loading}
               className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-3 disabled:opacity-50"
             >
