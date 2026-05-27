@@ -31,6 +31,7 @@ import { getLeaderboard } from './controllers/gamificationController.js';
 
 dotenv.config();
 console.log("SERVER DATABASE URL:", process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:([^@:]*)@/, ':****@') : "undefined");
+console.log("JWT_SECRET status:", process.env.JWT_SECRET ? `SET (length: ${process.env.JWT_SECRET.length})` : "NOT SET - using fallback");
 
 const app = express();
 const httpServer = createServer(app);
@@ -185,6 +186,18 @@ app.get('/api/global/search', authenticate, async (req, res) => {
 
 app.get('/', (req, res) => {
   res.json({ message: 'CampusBridge API is running' });
+});
+
+// Debug endpoint - helps diagnose environment variable issues
+app.get('/api/debug/env-check', (req, res) => {
+  res.json({
+    jwtSecretSet: !!process.env.JWT_SECRET,
+    jwtSecretLength: process.env.JWT_SECRET ? process.env.JWT_SECRET.length : 0,
+    nodeEnv: process.env.NODE_ENV || 'not set',
+    port: process.env.PORT || 'not set',
+    dbUrlSet: !!process.env.DATABASE_URL,
+    timestamp: new Date().toISOString()
+  });
 });
 
 app.use((err, req, res, next) => {

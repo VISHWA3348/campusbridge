@@ -166,8 +166,8 @@ export const login = async (req, res) => {
 
     const token = jwt.sign(
       { userId: user.id, role: user.role, collegeId: user.collegeId },
-      process.env.JWT_SECRET || 'secret',
-      { expiresIn: '1d' }
+      process.env.JWT_SECRET || 'Vishwa@8105',
+      { expiresIn: '7d' }
     );
 
     const { password: _, ...safeUser } = user;
@@ -530,8 +530,8 @@ export const googleLogin = async (req, res) => {
     // Generate standard JWT token
     const token = jwt.sign(
       { userId: user.id, role: user.role, collegeId: user.collegeId },
-      process.env.JWT_SECRET || 'secret',
-      { expiresIn: '1d' }
+      process.env.JWT_SECRET || 'Vishwa@8105',
+      { expiresIn: '7d' }
     );
 
     const { password: _, ...safeUser } = user;
