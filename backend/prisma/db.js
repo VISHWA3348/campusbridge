@@ -1,9 +1,42 @@
 import { PrismaClient } from '@prisma/client';
 
+const getSanitizedDbUrl = (url) => {
+  if (!url) return url;
+  try {
+    const prefix = 'postgresql://';
+    if (!url.startsWith(prefix)) return url;
+    
+    const remainder = url.slice(prefix.length);
+    const firstColonIdx = remainder.indexOf(':');
+    if (firstColonIdx === -1) return url;
+    
+    const lastAtIdx = remainder.lastIndexOf('@');
+    if (lastAtIdx === -1 || lastAtIdx <= firstColonIdx) return url;
+    
+    const user = remainder.slice(0, firstColonIdx);
+    const rawPassword = remainder.slice(firstColonIdx + 1, lastAtIdx);
+    const rest = remainder.slice(lastAtIdx);
+    
+    let encodedPassword = rawPassword;
+    if (rawPassword.includes('@') || rawPassword.includes(':') || rawPassword.includes('/') || rawPassword.includes('?') || rawPassword.includes('#')) {
+      if (!rawPassword.includes('%')) {
+        encodedPassword = encodeURIComponent(rawPassword);
+      }
+    }
+    
+    return `${prefix}${user}:${encodedPassword}${rest}`;
+  } catch (e) {
+    console.error('Failed to sanitize DATABASE_URL:', e.message);
+    return url;
+  }
+};
+
+const databaseUrl = getSanitizedDbUrl(process.env.DATABASE_URL);
+
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.DATABASE_URL,
+      url: databaseUrl,
     },
   },
   log: ['error'],
