@@ -451,6 +451,10 @@ model NotificationSetting {
   jobAlerts       Boolean @default(true)
   referralAlerts  Boolean @default(true)
   chatAlerts      Boolean @default(true)
+  webinarPush     Boolean @default(true)
+  jobPush         Boolean @default(true)
+  referralPush    Boolean @default(true)
+  chatPush        Boolean @default(true)
 }
 
 model Message {

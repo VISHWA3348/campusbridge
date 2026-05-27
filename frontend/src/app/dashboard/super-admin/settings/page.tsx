@@ -24,8 +24,11 @@ export default function SuperAdminSettings() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (user) {
-      fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))) + '/profile/me', {
+    if (user && token) {
+      const baseUrl = ((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api')));
+      
+      // Fetch profile
+      fetch(baseUrl + '/profile/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(res => res.json())
@@ -36,11 +39,58 @@ export default function SuperAdminSettings() {
         });
       })
       .catch(err => console.error(err));
+
+      // Fetch global platform settings
+      fetch(baseUrl + '/admin/settings', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.platformName) {
+          setPlatformName(data.platformName);
+        }
+        if (Array.isArray(data.features)) {
+          const map = (name: string) => {
+            const n = name.toLowerCase();
+            if (n === 'chat system' || n === 'chat' || n === 'real-time chat') return 'chat';
+            if (n === 'job portal' || n === 'jobs' || n === 'job postings') return 'jobs';
+            if (n === 'webinar module' || n === 'webinars' || n === 'webinar portal') return 'webinars';
+            if (n === 'referral system' || n === 'referrals') return 'referrals';
+            return null;
+          };
+          
+          setFeatures(prev => prev.map(f => {
+            const dbFeat = data.features.find((df: any) => map(df.featureName) === f.id);
+            return dbFeat ? { ...f, enabled: dbFeat.enabled } : f;
+          }));
+        }
+      })
+      .catch(err => console.error(err));
     }
   }, [user, token]);
 
-  const toggleFeature = (id: string) => {
-    setFeatures(features.map(f => f.id === id ? { ...f, enabled: !f.enabled } : f));
+  const toggleFeature = async (id: string) => {
+    // Instantly update local UI state
+    setFeatures(prev => prev.map(f => f.id === id ? { ...f, enabled: !f.enabled } : f));
+    
+    // Call server to toggle feature
+    try {
+      const baseUrl = ((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api')));
+      
+      const res = await fetch(`${baseUrl}/admin/features/${id}/toggle`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) {
+        throw new Error('Failed to update feature toggle on server');
+      }
+    } catch (err: any) {
+      console.error(err);
+      // Revert UI state on failure
+      setFeatures(prev => prev.map(f => f.id === id ? { ...f, enabled: !f.enabled } : f));
+      setMessage('Failed to toggle feature. Please try again.');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,8 +99,10 @@ export default function SuperAdminSettings() {
     setMessage('');
     
     try {
-      // Update personal profile
-      const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))) + '/profile/me', {
+      const baseUrl = ((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api')));
+
+      // 1. Update personal profile
+      const res = await fetch(baseUrl + '/profile/me', {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -60,6 +112,18 @@ export default function SuperAdminSettings() {
       });
       
       if (!res.ok) throw new Error('Failed to update personal settings');
+
+      // 2. Update platform name
+      const platformRes = await fetch(baseUrl + '/admin/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ platformName })
+      });
+
+      if (!platformRes.ok) throw new Error('Failed to update platform settings');
 
       if (user && token) {
         await refreshUser();
@@ -74,9 +138,10 @@ export default function SuperAdminSettings() {
   };
 
   const handlePhotoUpload = async (file: File) => {
+    const baseUrl = ((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api')));
     const fd = new FormData();
     fd.append('photo', file);
-    const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))) + '/profile/photo', {
+    const res = await fetch(baseUrl + '/profile/photo', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
       body: fd
@@ -87,7 +152,8 @@ export default function SuperAdminSettings() {
   };
 
   const handlePhotoRemove = async () => {
-    const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))) + '/profile/photo', {
+    const baseUrl = ((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api')));
+    const res = await fetch(baseUrl + '/profile/photo', {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });

@@ -93,7 +93,11 @@ export const getNotificationSettings = async (req, res) => {
           webinarAlerts: true,
           jobAlerts: true,
           referralAlerts: true,
-          chatAlerts: true
+          chatAlerts: true,
+          webinarPush: true,
+          jobPush: true,
+          referralPush: true,
+          chatPush: true
         }
       });
     }
@@ -105,30 +109,50 @@ export const getNotificationSettings = async (req, res) => {
 };
 
 export const updateNotificationSettings = async (req, res) => {
-  const { emailEnabled, pushEnabled, webinarAlerts, jobAlerts, referralAlerts, chatAlerts } = req.body;
+  const { 
+    emailEnabled, 
+    pushEnabled, 
+    webinarAlerts, 
+    jobAlerts, 
+    referralAlerts, 
+    chatAlerts,
+    webinarPush,
+    jobPush,
+    referralPush,
+    chatPush
+  } = req.body;
   try {
     const settings = await prisma.notificationSetting.upsert({
       where: { userId: req.user.userId },
       update: {
-        emailEnabled,
-        pushEnabled,
-        webinarAlerts,
-        jobAlerts,
-        referralAlerts,
-        chatAlerts
+        emailEnabled: emailEnabled ?? true,
+        pushEnabled: pushEnabled ?? true,
+        webinarAlerts: webinarAlerts ?? true,
+        jobAlerts: jobAlerts ?? true,
+        referralAlerts: referralAlerts ?? true,
+        chatAlerts: chatAlerts ?? true,
+        webinarPush: webinarPush ?? true,
+        jobPush: jobPush ?? true,
+        referralPush: referralPush ?? true,
+        chatPush: chatPush ?? true
       },
       create: {
         userId: req.user.userId,
-        emailEnabled,
-        pushEnabled,
-        webinarAlerts,
-        jobAlerts,
-        referralAlerts,
-        chatAlerts
+        emailEnabled: emailEnabled ?? true,
+        pushEnabled: pushEnabled ?? true,
+        webinarAlerts: webinarAlerts ?? true,
+        jobAlerts: jobAlerts ?? true,
+        referralAlerts: referralAlerts ?? true,
+        chatAlerts: chatAlerts ?? true,
+        webinarPush: webinarPush ?? true,
+        jobPush: jobPush ?? true,
+        referralPush: referralPush ?? true,
+        chatPush: chatPush ?? true
       }
     });
     res.json(settings);
   } catch (error) {
+    console.error('Update notification settings error:', error);
     res.status(500).json({ error: 'Failed to update settings' });
   }
 };

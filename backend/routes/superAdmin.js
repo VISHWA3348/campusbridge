@@ -143,10 +143,38 @@ router.post('/signup-codes', createSignupCode);
 router.put('/signup-codes/:id', updateSignupCode);
 router.delete('/signup-codes/:id', deleteSignupCode);
 
+const mapName = (name) => {
+  const n = name.toLowerCase();
+  if (n === 'chat' || n === 'chat system' || n === 'real-time chat') return 'Chat System';
+  if (n === 'webinar' || n === 'webinar module' || n === 'webinar portal' || n === 'webinars') return 'Webinar Module';
+  if (n === 'referrals' || n === 'referral system') return 'Referral System';
+  if (n === 'jobs' || n === 'job portal' || n === 'job postings') return 'Job Portal';
+  return name;
+};
+
 router.get('/features', async (req, res) => {
   try {
-    const features = await prisma.featureToggle.findMany();
-    res.json(features);
+    const requiredFeatures = [
+      'Referral System',
+      'Job Portal',
+      'Chat System',
+      'Webinar Module'
+    ];
+    
+    // Check if they exist, if not, create them
+    const existing = await prisma.featureToggle.findMany();
+    const existingNames = existing.map(e => e.featureName);
+    
+    for (const name of requiredFeatures) {
+      if (!existingNames.includes(name)) {
+        const newToggle = await prisma.featureToggle.create({
+          data: { featureName: name, enabled: true }
+        });
+        existing.push(newToggle);
+      }
+    }
+    
+    res.json(existing);
   } catch (error) {
     console.error('Get features error:', error);
     res.status(500).json({ error: 'Failed to fetch features' });
@@ -154,7 +182,16 @@ router.get('/features', async (req, res) => {
 });
 
 router.post('/features/:id/toggle', async (req, res) => {
-  const feature = await prisma.featureToggle.findUnique({ where: { id: parseInt(req.params.id) } });
+  const param = req.params.id;
+  let feature;
+  
+  if (isNaN(parseInt(param))) {
+    const featureName = mapName(param);
+    feature = await prisma.featureToggle.findUnique({ where: { featureName } });
+  } else {
+    feature = await prisma.featureToggle.findUnique({ where: { id: parseInt(param) } });
+  }
+
   if (feature) {
     const updated = await prisma.featureToggle.update({
       where: { id: feature.id },
@@ -163,6 +200,95 @@ router.post('/features/:id/toggle', async (req, res) => {
     res.json(updated);
   } else {
     res.status(404).json({ error: 'Feature not found' });
+  }
+});
+
+// Get global platform settings
+router.get('/settings', async (req, res) => {
+  try {
+    const superAdmin = await prisma.user.findFirst({
+      where: { role: 'SUPER_ADMIN' },
+      include: { college: true }
+    });
+    
+    if (!superAdmin) {
+      return res.status(404).json({ error: 'Super Admin or College not found' });
+    }
+
+    const requiredFeatures = [
+      'Referral System',
+      'Job Portal',
+      'Chat System',
+      'Webinar Module'
+    ];
+    
+    const existing = await prisma.featureToggle.findMany();
+    const existingNames = existing.map(e => e.featureName);
+    
+    for (const name of requiredFeatures) {
+      if (!existingNames.includes(name)) {
+        const newToggle = await prisma.featureToggle.create({
+          data: { featureName: name, enabled: true }
+        });
+        existing.push(newToggle);
+      }
+    }
+
+    res.json({
+      platformName: superAdmin.college?.name || 'CampusBridge',
+      features: existing
+    });
+  } catch (error) {
+    console.error('Get platform settings error:', error);
+    res.status(500).json({ error: 'Failed to fetch platform settings' });
+  }
+});
+
+// Update global platform settings
+router.put('/settings', async (req, res) => {
+  try {
+    const { platformName, features } = req.body;
+
+    const superAdmin = await prisma.user.findFirst({
+      where: { role: 'SUPER_ADMIN' }
+    });
+
+    if (!superAdmin) {
+      return res.status(404).json({ error: 'Super Admin not found' });
+    }
+
+    if (platformName !== undefined) {
+      await prisma.college.update({
+        where: { id: superAdmin.collegeId },
+        data: { name: platformName }
+      });
+    }
+
+    if (Array.isArray(features)) {
+      for (const feat of features) {
+        if (feat.id !== undefined && feat.enabled !== undefined) {
+          let dbFeat;
+          if (isNaN(parseInt(feat.id))) {
+            const featureName = mapName(feat.id);
+            dbFeat = await prisma.featureToggle.findUnique({ where: { featureName } });
+          } else {
+            dbFeat = await prisma.featureToggle.findUnique({ where: { id: parseInt(feat.id) } });
+          }
+
+          if (dbFeat) {
+            await prisma.featureToggle.update({
+              where: { id: dbFeat.id },
+              data: { enabled: feat.enabled }
+            });
+          }
+        }
+      }
+    }
+
+    res.json({ message: 'Platform settings updated successfully' });
+  } catch (error) {
+    console.error('Update platform settings error:', error);
+    res.status(500).json({ error: 'Failed to update platform settings' });
   }
 });
 

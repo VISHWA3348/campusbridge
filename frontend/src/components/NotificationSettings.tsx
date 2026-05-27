@@ -11,17 +11,18 @@ export default function NotificationSettings() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))) + '/notifications/settings', {
+      const baseUrl = ((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api')));
+      const res = await fetch(baseUrl + '/notifications/settings', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();
       
       // Convert backend object to frontend array format for the table
       const mappedSettings = [
-        { type: 'WEBINARS', email: data.webinarAlerts, push: data.pushEnabled && data.webinarAlerts },
-        { type: 'JOBS', email: data.jobAlerts, push: data.pushEnabled && data.jobAlerts },
-        { type: 'REFERRALS', email: data.referralAlerts, push: data.pushEnabled && data.referralAlerts },
-        { type: 'CHATS', email: data.chatAlerts, push: data.pushEnabled && data.chatAlerts }
+        { type: 'WEBINARS', email: data.webinarAlerts, push: data.webinarPush },
+        { type: 'JOBS', email: data.jobAlerts, push: data.jobPush },
+        { type: 'REFERRALS', email: data.referralAlerts, push: data.referralPush },
+        { type: 'CHATS', email: data.chatAlerts, push: data.chatPush }
       ];
       setSettings(mappedSettings);
     } catch (e) {
@@ -53,9 +54,14 @@ export default function NotificationSettings() {
         jobAlerts: settings.find(s => s.type === 'JOBS')?.email || false,
         referralAlerts: settings.find(s => s.type === 'REFERRALS')?.email || false,
         chatAlerts: settings.find(s => s.type === 'CHATS')?.email || false,
+        webinarPush: settings.find(s => s.type === 'WEBINARS')?.push || false,
+        jobPush: settings.find(s => s.type === 'JOBS')?.push || false,
+        referralPush: settings.find(s => s.type === 'REFERRALS')?.push || false,
+        chatPush: settings.find(s => s.type === 'CHATS')?.push || false,
       };
 
-      const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'https://campusbridge-e4cv.onrender.com/api'))) + '/notifications/settings', {
+      const baseUrl = ((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api')));
+      const res = await fetch(baseUrl + '/notifications/settings', {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

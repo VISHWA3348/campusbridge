@@ -33,7 +33,13 @@ export const authenticate = async (req, res, next) => {
       });
     }
 
-    req.user = { ...decoded, collegeId: user.collegeId, role: user.role };
+    req.user = { 
+      ...decoded, 
+      id: user.id, 
+      userId: user.id, 
+      collegeId: user.collegeId, 
+      role: user.role 
+    };
     next();
   } catch (err) {
     console.error('JWT Verification Failed:', err.message, '| Secret length:', getSecret().length);

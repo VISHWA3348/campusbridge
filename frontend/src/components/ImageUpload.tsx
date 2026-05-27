@@ -15,6 +15,10 @@ export default function ImageUpload({ currentImage, onUpload, onRemove }: ImageU
   const [preview, setPreview] = useState<string | null>(getFileUrl(currentImage));
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  React.useEffect(() => {
+    setPreview(getFileUrl(currentImage));
+  }, [currentImage]);
+
   const compressImage = (file: File): Promise<Blob> => {
     return new Promise((resolve) => {
       const reader = new FileReader();
