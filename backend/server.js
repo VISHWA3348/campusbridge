@@ -198,7 +198,7 @@ app.get('/api/debug/env-check', (req, res) => {
     dbUrlSet: !!process.env.DATABASE_URL,
     dbUrlMasked: process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:([^@:]*)@/, ':****@') : 'undefined',
     dbUrlSanitizedMasked: databaseUrl ? databaseUrl.replace(/:([^@:]*)@/, ':****@') : 'undefined',
-    buildVersion: "v3",
+    buildVersion: "v4",
     timestamp: new Date().toISOString()
   });
 });

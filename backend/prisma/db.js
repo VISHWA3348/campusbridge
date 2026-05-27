@@ -24,6 +24,23 @@ const getSanitizedDbUrl = (url) => {
       }
     }
     
+    // Check if it is a pooler URL (contains pooler.supabase.com or port 6543, or user has a project suffix)
+    if (user.includes('.') && (url.includes('pooler.supabase.com') || url.includes(':6543'))) {
+      const parts = user.split('.');
+      const mainUser = parts[0]; // postgres
+      const projectId = parts[1]; // oukaipvuibsgchpwkwzu
+      
+      const slashIdx = rest.indexOf('/', 1); // find slash after the '@'
+      let dbNameAndOptions = '/postgres?sslmode=require';
+      if (slashIdx !== -1) {
+        dbNameAndOptions = rest.slice(slashIdx);
+      }
+      
+      const directHost = `db.${projectId}.supabase.co:5432`;
+      console.log(`[DB CONFIG] Converting pooler URL to direct connection: db.${projectId}.supabase.co:5432`);
+      return `${prefix}${mainUser}:${encodedPassword}@${directHost}${dbNameAndOptions}`;
+    }
+    
     return `${prefix}${user}:${encodedPassword}${rest}`;
   } catch (e) {
     console.error('Failed to sanitize DATABASE_URL:', e.message);
