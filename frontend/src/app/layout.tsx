@@ -74,9 +74,13 @@ export const metadata: Metadata = {
     creator: "@CampusBridge",
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/icon.svg",
+    apple: [
+      { url: "/apple-icon.svg", type: "image/svg+xml", sizes: "180x180" },
+    ],
   }
 };
 
