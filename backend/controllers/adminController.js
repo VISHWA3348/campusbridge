@@ -201,6 +201,13 @@ export const getSuperAdminAnalytics = async (req, res) => {
 export const getCollegeAdminAnalytics = async (req, res) => {
   const collegeId = req.user.collegeId;
   try {
+    // Pre-fetch all student IDs in the college to bypass Prisma's groupBy nested relation filter limitation
+    const collegeStudents = await prisma.student.findMany({
+      where: { user: { collegeId } },
+      select: { id: true }
+    });
+    const studentIds = collegeStudents.map(s => s.id);
+
     const [
       totalStudents,
       totalAlumni,
@@ -234,7 +241,7 @@ export const getCollegeAdminAnalytics = async (req, res) => {
       }),
       prisma.careerRoadmap.groupBy({
         by: ['title'],
-        where: { student: { user: { collegeId } } },
+        where: { studentId: { in: studentIds } },
         _count: { title: true },
         orderBy: { _count: { title: 'desc' } },
         take: 3
@@ -250,7 +257,7 @@ export const getCollegeAdminAnalytics = async (req, res) => {
       }),
       prisma.resumeAnalysis.groupBy({
         by: ['placementReadiness'],
-        where: { student: { user: { collegeId } } },
+        where: { studentId: { in: studentIds } },
         _count: { id: true }
       }),
       prisma.user.groupBy({

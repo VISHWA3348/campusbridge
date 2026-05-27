@@ -1,6 +1,6 @@
 import express from 'express';
 import prisma from '../prisma/db.js';
-import { authenticate } from '../middleware/auth.js';
+import { authenticate, authorizeRole } from '../middleware/auth.js';
 import { createNotification } from '../utils/notification.js';
 import { 
   getSuperAdminAnalytics, 
@@ -45,6 +45,7 @@ import { uploadCollege } from '../utils/upload.js';
 const router = express.Router();
 
 router.use(authenticate);
+router.use(authorizeRole('SUPER_ADMIN'));
 
 router.get('/analytics/overview', getSuperAdminAnalytics);
 

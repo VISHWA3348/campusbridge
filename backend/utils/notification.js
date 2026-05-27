@@ -64,11 +64,11 @@ export const createNotification = async (req, {
         else if (type === 'CHAT' && !settings.chatAlerts) shouldSendEmail = false;
 
         if (shouldSendEmail) {
-          await sendNotificationEmail(user.email, { 
+          sendNotificationEmail(user.email, { 
             title: title || 'New Notification', 
             message, 
             link 
-          });
+          }).catch(emailErr => console.error('Background notification email error:', emailErr));
         }
       }
     }

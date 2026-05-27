@@ -1,6 +1,6 @@
 import express from 'express';
 import prisma from '../prisma/db.js';
-import { authenticate } from '../middleware/auth.js';
+import { authenticate, authorizeRole } from '../middleware/auth.js';
 import { 
   getCollegeAdminAnalytics, 
   getPendingVerifications, 
@@ -20,6 +20,7 @@ import { createNotification } from '../utils/notification.js';
 const router = express.Router();
 
 router.use(authenticate);
+router.use(authorizeRole('COLLEGE_ADMIN'));
 
 router.get('/analytics', getCollegeAdminAnalytics);
 router.get('/verifications/pending', getPendingVerifications);
