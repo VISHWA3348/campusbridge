@@ -66,10 +66,13 @@ export default function UsersManagementPage() {
         fetchUsers(),
         fetchColleges()
       ]);
-      setUsers(Array.isArray(usersData) ? usersData : []);
-      setColleges(Array.isArray(collegesData) ? collegesData : []);
+      // Handle both paginated {users: [], total} and plain array responses
+      const usersList = Array.isArray(usersData) ? usersData : (usersData?.users || []);
+      setUsers(usersList);
+      const collegesList = Array.isArray(collegesData) ? collegesData : (collegesData?.colleges || []);
+      setColleges(collegesList);
     } catch (err) {
-      console.error(err);
+      console.error('Failed to load users/colleges:', err);
     }
     setLoading(false);
   };
@@ -116,10 +119,10 @@ export default function UsersManagementPage() {
   };
 
   const filteredUsers = users.filter(u => {
-    const matchesSearch = u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (u.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (u.email || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === 'ALL' || u.role === roleFilter;
-    const matchesCollege = collegeFilter === 'ALL' || u.collegeId.toString() === collegeFilter;
+    const matchesCollege = collegeFilter === 'ALL' || (u.collegeId && u.collegeId.toString() === collegeFilter);
     return matchesSearch && matchesRole && matchesCollege;
   });
 

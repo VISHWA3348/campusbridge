@@ -527,9 +527,19 @@ export async function fetchAdminPlacementStats() {
 
 export const fetchAdminStats = fetchAdminOverview;
 
+// Super Admin self-profile
+export async function fetchSuperAdminProfile() {
+  const res = await fetch(`${API_BASE_URL}/admin/me`, { headers: getHeaders() });
+  return res.json();
+}
+
 export async function fetchColleges() {
   const res = await fetch(`${API_BASE_URL}/admin/colleges`, { headers: getHeaders() });
-  return res.json();
+  const data = await res.json();
+  // Handle both array and paginated {colleges: [], total} response formats
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.colleges)) return data.colleges;
+  return data;
 }
 
 export async function fetchCollegeById(id: number) {

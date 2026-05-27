@@ -70,15 +70,56 @@ router.put('/departments/:id', updateDepartment);
 router.delete('/departments/:id', deleteDepartment);
 router.patch('/departments/:id/toggle-status', toggleDepartmentStatus);
 
+// Super Admin self-profile endpoint
+router.get('/me', async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId },
+      include: { college: true }
+    });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    const { password, otp, otpExpiresAt, verificationToken, ...safeUser } = user;
+    res.json(safeUser);
+  } catch (error) {
+    console.error('Super admin self-profile error:', error);
+    res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+});
+
 router.get('/users', async (req, res) => {
-  const users = await prisma.user.findMany({ 
-    include: { 
-      college: true,
-      student: true,
-      alumni: true
-    } 
-  });
-  res.json(users);
+  try {
+    const { page = 1, limit = 100, role, search } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const where = {};
+    if (role) where.role = role;
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({ 
+        where,
+        include: { 
+          college: true,
+          student: true,
+          alumni: true
+        },
+        skip,
+        take: parseInt(limit),
+        orderBy: { createdAt: 'desc' }
+      }),
+      prisma.user.count({ where })
+    ]);
+    
+    res.json({ users, total, page: parseInt(page), limit: parseInt(limit) });
+  } catch (error) {
+    console.error('Get users error:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
 });
 
 router.post('/users', createUser);
@@ -88,8 +129,8 @@ router.patch('/users/:id/toggle-status', toggleUserStatus);
 router.get('/users/:id/profile', getUserFullProfile);
 
 router.get('/subscriptions', getSubscriptions);
+router.get('/subscriptions/analytics', getSubscriptionAnalytics); // Must be before /:id
 router.patch('/subscriptions/:id', updateCollegeSubscription);
-router.get('/subscriptions/analytics', getSubscriptionAnalytics);
 
 router.get('/plans', getPlans);
 router.post('/plans', createPlan);
@@ -103,8 +144,13 @@ router.put('/signup-codes/:id', updateSignupCode);
 router.delete('/signup-codes/:id', deleteSignupCode);
 
 router.get('/features', async (req, res) => {
-  const features = await prisma.featureToggle.findMany();
-  res.json(features);
+  try {
+    const features = await prisma.featureToggle.findMany();
+    res.json(features);
+  } catch (error) {
+    console.error('Get features error:', error);
+    res.status(500).json({ error: 'Failed to fetch features' });
+  }
 });
 
 router.post('/features/:id/toggle', async (req, res) => {
@@ -121,12 +167,27 @@ router.post('/features/:id/toggle', async (req, res) => {
 });
 
 router.get('/system/health', async (req, res) => {
-  res.json({
-    status: 'healthy',
-    uptime: process.uptime(),
-    memory: process.memoryUsage(),
-    database: 'connected'
-  });
+  try {
+    // Verify DB is actually reachable
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({
+      status: 'healthy',
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      database: 'connected',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.json({
+      status: 'degraded',
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      database: 'error',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 router.get('/audit-logs', async (req, res) => {

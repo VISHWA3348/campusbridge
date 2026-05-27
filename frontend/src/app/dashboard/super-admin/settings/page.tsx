@@ -8,7 +8,7 @@ import { Save, Globe, Shield, ToggleLeft, ToggleRight, User, FileText } from 'lu
 import NotificationSettings from '@/components/NotificationSettings';
 
 export default function SuperAdminSettings() {
-  const { user, token, login: updateAuthUser } = useAuth();
+  const { user, token, refreshUser } = useAuth();
   const [personalData, setPersonalData] = useState({
     name: '',
     bio: ''
@@ -62,7 +62,7 @@ export default function SuperAdminSettings() {
       if (!res.ok) throw new Error('Failed to update personal settings');
 
       if (user && token) {
-        updateAuthUser(token, { ...user, name: personalData.name, bio: personalData.bio });
+        await refreshUser();
       }
 
       setMessage('Settings updated successfully!');
@@ -82,8 +82,7 @@ export default function SuperAdminSettings() {
       body: fd
     });
     if (res.ok) {
-      const data = await res.json();
-      if (user && token) updateAuthUser(token, { ...user, profilePhoto: data.photo });
+      await refreshUser();
     }
   };
 
@@ -93,7 +92,7 @@ export default function SuperAdminSettings() {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (res.ok) {
-      if (user && token) updateAuthUser(token, { ...user, profilePhoto: null });
+      await refreshUser();
     }
   };
 
