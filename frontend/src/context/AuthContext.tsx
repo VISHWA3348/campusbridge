@@ -25,6 +25,7 @@ interface AuthContextType {
   login: (token: string, user: User) => void;
   logout: () => void;
   refreshUser: () => Promise<any>;
+  updateUser: (user: User) => void;
   loading: boolean;
 }
 
@@ -93,11 +94,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push(roleRoutes[newUser.role] || '/');
   };
 
-  const refreshUser = async () => {
+  const refreshUser = async (retries = 1) => {
     const currentToken = token || localStorage.getItem('token');
     if (!currentToken) return;
 
-    // Don't try to refresh an expired token
     if (isTokenExpired(currentToken)) {
       console.warn('[AuthContext] Token expired during refreshUser - logging out');
       logout();
@@ -124,11 +124,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return freshUser;
         } else {
           console.warn('refreshUser: Server returned non-JSON response');
+          if (retries > 0) {
+            console.log(`Retrying refreshUser in 2s... (${retries} retries left)`);
+            await new Promise(r => setTimeout(r, 2000));
+            return refreshUser(retries - 1);
+          }
         }
+      } else if (res.status >= 500 && retries > 0) {
+         console.warn(`refreshUser: Server error ${res.status}. Retrying in 2s...`);
+         await new Promise(r => setTimeout(r, 2000));
+         return refreshUser(retries - 1);
       }
     } catch (err) {
       console.error('Failed to refresh user:', err);
+      if (retries > 0) {
+        console.log(`Retrying refreshUser in 2s... (${retries} retries left)`);
+        await new Promise(r => setTimeout(r, 2000));
+        return refreshUser(retries - 1);
+      }
     }
+  };
+
+  const updateUser = (newUser: User) => {
+    setUser(newUser);
+    localStorage.setItem('user', JSON.stringify(newUser));
   };
 
   const logout = () => {
@@ -140,7 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, refreshUser, loading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, refreshUser, updateUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

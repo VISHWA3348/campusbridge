@@ -54,8 +54,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/notifications', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
-    const data = await res.json();
-    setNotifications(Array.isArray(data) ? data : []);
+    try {
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await res.json();
+        setNotifications(Array.isArray(data) ? data : []);
+      }
+    } catch (e) {
+      console.error('Failed to parse notifications:', e);
+    }
   };
 
   const fetchUnreadCount = async () => {
@@ -64,9 +71,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/messages/conversations', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
-      const data = await res.json();
-      const count = data.reduce((acc: number, conv: any) => acc + conv.unreadCount, 0);
-      setUnreadChatCount(count);
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await res.json();
+        const count = data.reduce((acc: number, conv: any) => acc + conv.unreadCount, 0);
+        setUnreadChatCount(count);
+      }
     } catch (e) { }
   };
 
@@ -125,8 +135,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const res = await fetch(`${(typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))}/global/search?q=${searchQuery}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
-        const data = await res.json();
-        setSearchResults(data);
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await res.json();
+          setSearchResults(data);
+        } else {
+          setSearchResults(null);
+        }
         setIsSearching(false);
       } else {
         setSearchResults(null);
@@ -158,8 +173,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/admin/features', {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
-        const data = await res.json();
-        setFeatures(Array.isArray(data) ? data : []);
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await res.json();
+          setFeatures(Array.isArray(data) ? data : []);
+        }
       } catch (e) {
         console.error('Failed to fetch features:', e);
       }

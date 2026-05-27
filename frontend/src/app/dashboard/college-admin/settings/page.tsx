@@ -8,7 +8,7 @@ import { Save, Building2, Hash, Layers, Users, User, FileText } from 'lucide-rea
 import NotificationSettings from '@/components/NotificationSettings';
 
 export default function CollegeAdminSettings() {
-  const { user, token, refreshUser } = useAuth();
+  const { user, token, refreshUser, updateUser } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     bio: '',
@@ -26,7 +26,14 @@ export default function CollegeAdminSettings() {
       fetch(`${(typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))}/profile/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-        .then(res => res.json())
+        .then(async res => {
+          if (!res.ok) throw new Error('Failed to fetch profile');
+          const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            return res.json();
+          }
+          throw new Error('Non-JSON response');
+        })
         .then(data => {
           setFormData(prev => ({
             ...prev,
@@ -58,9 +65,23 @@ export default function CollegeAdminSettings() {
         body: JSON.stringify({ name: formData.name, bio: formData.bio })
       });
 
-      if (!profileRes.ok) throw new Error('Failed to update personal profile');
+      if (!profileRes.ok) {
+        const contentType = profileRes.headers.get('content-type');
+        let errMessage = 'Failed to update personal profile';
+        if (contentType && contentType.includes('application/json')) {
+          const errData = await profileRes.json();
+          errMessage = errData.error || errMessage;
+        }
+        throw new Error(errMessage);
+      }
 
-      await refreshUser();
+      const profileData = await profileRes.json();
+      if (profileData.user && updateUser) {
+        updateUser(profileData.user);
+      } else {
+        await refreshUser();
+      }
+      
       setMessage('Settings updated successfully!');
     } catch (err: any) {
       setMessage(err.message);

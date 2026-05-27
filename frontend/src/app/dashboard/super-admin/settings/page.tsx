@@ -8,7 +8,7 @@ import { Save, Globe, Shield, ToggleLeft, ToggleRight, User, FileText } from 'lu
 import NotificationSettings from '@/components/NotificationSettings';
 
 export default function SuperAdminSettings() {
-  const { user, token, refreshUser } = useAuth();
+  const { user, token, refreshUser, updateUser } = useAuth();
   const [personalData, setPersonalData] = useState({
     name: '',
     bio: ''
@@ -31,14 +31,21 @@ export default function SuperAdminSettings() {
       fetch(baseUrl + '/profile/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) throw new Error('Failed to fetch profile');
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          return res.json();
+        }
+        throw new Error('Non-JSON response');
+      })
       .then(data => {
         setPersonalData({
           name: data.name || '',
           bio: data.bio || ''
         });
       })
-      .catch(err => console.error(err));
+      .catch(err => console.error('Error fetching profile:', err));
 
       // Fetch global platform settings
       fetch(baseUrl + '/admin/settings', {
@@ -111,7 +118,17 @@ export default function SuperAdminSettings() {
         body: JSON.stringify(personalData)
       });
       
-      if (!res.ok) throw new Error('Failed to update personal settings');
+      if (!res.ok) {
+        const contentType = res.headers.get('content-type');
+        let errMessage = 'Failed to update personal settings';
+        if (contentType && contentType.includes('application/json')) {
+          const errData = await res.json();
+          errMessage = errData.error || errMessage;
+        }
+        throw new Error(errMessage);
+      }
+      
+      const profileData = await res.json();
 
       // 2. Update platform name
       const platformRes = await fetch(baseUrl + '/admin/settings', {
@@ -123,10 +140,16 @@ export default function SuperAdminSettings() {
         body: JSON.stringify({ platformName })
       });
 
-      if (!platformRes.ok) throw new Error('Failed to update platform settings');
+      if (!platformRes.ok) {
+        throw new Error('Failed to update platform settings');
+      }
 
       if (user && token) {
-        await refreshUser();
+        if (profileData.user && updateUser) {
+           updateUser(profileData.user);
+        } else {
+           await refreshUser();
+        }
       }
 
       setMessage('Settings updated successfully!');

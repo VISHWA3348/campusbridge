@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Save, User, Building2, Hash, GraduationCap, Users, FileText, Link as LinkIcon, Code, Share2, Globe, Upload, ShieldCheck, CheckCircle2, XCircle, Clock } from 'lucide-react';
 
 export default function StudentSettings() {
-  const { user, token, refreshUser } = useAuth();
+  const { user, token, refreshUser, updateUser } = useAuth();
   const [formData, setFormData] = useState<any>({
     name: '',
     bio: '',
@@ -45,7 +45,14 @@ export default function StudentSettings() {
       fetch(`${(typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))}/profile/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-        .then(res => res.json())
+        .then(async res => {
+          if (!res.ok) throw new Error('Failed to fetch profile');
+          const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            return res.json();
+          }
+          throw new Error('Non-JSON response');
+        })
         .then(data => {
           setFormData({
             name: data.name || '',
@@ -94,9 +101,23 @@ export default function StudentSettings() {
         body: JSON.stringify(formData)
       });
 
-      if (!res.ok) throw new Error('Failed to update settings');
+      if (!res.ok) {
+        const contentType = res.headers.get('content-type');
+        let errMessage = 'Failed to update settings';
+        if (contentType && contentType.includes('application/json')) {
+          const errData = await res.json();
+          errMessage = errData.error || errMessage;
+        }
+        throw new Error(errMessage);
+      }
 
-      await refreshUser();
+      const profileData = await res.json();
+      if (profileData.user && updateUser) {
+        updateUser(profileData.user);
+      } else {
+        await refreshUser();
+      }
+      
       setMessage('Settings updated successfully!');
     } catch (err: any) {
       setMessage(err.message);

@@ -104,7 +104,8 @@ export const getNotificationSettings = async (req, res) => {
 
     res.json(settings);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch settings' });
+    console.error('Fetch notification settings error:', error);
+    res.status(500).json({ error: error.message || 'Failed to fetch settings' });
   }
 };
 
@@ -153,6 +154,6 @@ export const updateNotificationSettings = async (req, res) => {
     res.json(settings);
   } catch (error) {
     console.error('Update notification settings error:', error);
-    res.status(500).json({ error: 'Failed to update settings' });
+    res.status(500).json({ error: error.message || 'Failed to update settings' });
   }
 };

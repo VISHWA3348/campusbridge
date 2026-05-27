@@ -20,8 +20,8 @@ async function main() {
   console.log('=== SEEDING SSREC COLLEGE ===');
   
   const collegeCode = '7131';
-  const adminEmail = 'thevishwaoffical@gmail.com';
-  const adminPassword = 'Vshwa@8105';
+  const adminEmail = 'thevishwaofficial@gmail.com';
+  const adminPassword = 'Vishwa@8105';
   
   try {
     // 1. Check if college already exists

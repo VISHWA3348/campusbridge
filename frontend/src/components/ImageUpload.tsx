@@ -16,7 +16,14 @@ export default function ImageUpload({ currentImage, onUpload, onRemove }: ImageU
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    setPreview(getFileUrl(currentImage));
+    const url = getFileUrl(currentImage);
+    if (url && url.startsWith('http')) {
+      // Add cache buster only to actual URLs, not data URIs
+      const separator = url.includes('?') ? '&' : '?';
+      setPreview(`${url}${separator}t=${new Date().getTime()}`);
+    } else {
+      setPreview(url);
+    }
   }, [currentImage]);
 
   const compressImage = (file: File): Promise<Blob> => {

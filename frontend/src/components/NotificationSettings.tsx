@@ -15,17 +15,29 @@ export default function NotificationSettings() {
       const res = await fetch(baseUrl + '/notifications/settings', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
-      const data = await res.json();
       
-      // Convert backend object to frontend array format for the table
-      const mappedSettings = [
-        { type: 'WEBINARS', email: data.webinarAlerts, push: data.webinarPush },
-        { type: 'JOBS', email: data.jobAlerts, push: data.jobPush },
-        { type: 'REFERRALS', email: data.referralAlerts, push: data.referralPush },
-        { type: 'CHATS', email: data.chatAlerts, push: data.chatPush }
-      ];
-      setSettings(mappedSettings);
+      if (!res.ok) {
+        throw new Error('Failed to fetch settings');
+      }
+
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await res.json();
+        
+        // Convert backend object to frontend array format for the table
+        const mappedSettings = [
+          { type: 'WEBINARS', email: data.webinarAlerts, push: data.webinarPush },
+          { type: 'JOBS', email: data.jobAlerts, push: data.jobPush },
+          { type: 'REFERRALS', email: data.referralAlerts, push: data.referralPush },
+          { type: 'CHATS', email: data.chatAlerts, push: data.chatPush }
+        ];
+        setSettings(mappedSettings);
+      } else {
+        throw new Error('Server returned non-JSON response');
+      }
     } catch (e) {
+      console.error('Error fetching notification settings:', e);
+      setMessage({ type: 'error', text: 'Failed to load notification settings. Please refresh.' });
       console.error(e);
     } finally {
       setLoading(false);
@@ -69,13 +81,25 @@ export default function NotificationSettings() {
         },
         body: JSON.stringify(payload)
       });
+      
       if (res.ok) {
-        setMessage({ type: 'success', text: 'Notification preferences updated successfully!' });
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          await res.json();
+          setMessage({ type: 'success', text: 'Notification preferences updated successfully!' });
+        } else {
+           setMessage({ type: 'success', text: 'Notification preferences updated successfully!' });
+        }
       } else {
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+           const errData = await res.json();
+           throw new Error(errData.error || 'Failed to save');
+        }
         throw new Error('Failed to save');
       }
-    } catch (e) {
-      setMessage({ type: 'error', text: 'Failed to update preferences. Please try again.' });
+    } catch (e: any) {
+      setMessage({ type: 'error', text: e.message || 'Failed to update preferences. Please try again.' });
     } finally {
       setSaving(false);
     }

@@ -131,7 +131,18 @@ export const updateProfile = async (req, res) => {
       }
     }
 
-    res.json({ message: 'Profile updated successfully' });
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: req.user.userId },
+      include: {
+        college: true,
+        student: true,
+        alumni: true,
+      }
+    });
+
+    const { password, otp, otpExpiresAt, verificationToken, ...safeUser } = updatedUser;
+
+    res.json({ message: 'Profile updated successfully', user: safeUser });
 
     // Gamification - try/catch to ensure profile update doesn't fail if points fail
     try {
@@ -153,7 +164,11 @@ export const uploadPhoto = async (req, res) => {
     
     // Delete old photo from Cloudinary if exists
     if (user.profilePhotoPublicId) {
-      await deleteFromCloudinary(user.profilePhotoPublicId);
+      try {
+        await deleteFromCloudinary(user.profilePhotoPublicId);
+      } catch (err) {
+        console.error('Error deleting old photo from Cloudinary:', err);
+      }
     } else if (user.profilePhoto && user.profilePhoto.startsWith('uploads/')) {
       // Cleanup legacy local files if any
       const oldPath = path.join(process.cwd(), user.profilePhoto);
@@ -185,7 +200,11 @@ export const removePhoto = async (req, res) => {
     const user = await prisma.user.findUnique({ where: { id: req.user.userId } });
     
     if (user.profilePhotoPublicId) {
-      await deleteFromCloudinary(user.profilePhotoPublicId);
+      try {
+        await deleteFromCloudinary(user.profilePhotoPublicId);
+      } catch (err) {
+        console.error('Error deleting photo from Cloudinary:', err);
+      }
     } else if (user.profilePhoto && user.profilePhoto.startsWith('uploads/')) {
       const oldPath = path.join(process.cwd(), user.profilePhoto);
       if (fs.existsSync(oldPath)) {

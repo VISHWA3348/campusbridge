@@ -9,7 +9,10 @@ const getHeaders = () => {
 };
 
 const handleResponse = async (res: Response, url: string) => {
-  if (res.status === 401 || res.status === 403) {
+  const contentType = res.headers.get('content-type');
+  const isJson = contentType && contentType.includes('application/json');
+
+  if (res.status === 401) {
     if (!url.endsWith('/auth/login') && !url.endsWith('/auth/google-login')) {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token');
@@ -18,13 +21,27 @@ const handleResponse = async (res: Response, url: string) => {
           window.location.href = '/login?expired=true';
         }
       }
-      const data = await res.json().catch(() => ({}));
+      
+      let data: any = {};
+      if (isJson) {
+        data = await res.json().catch(() => ({}));
+      }
       throw new Error(data.error || 'Session expired. Please login again.');
     }
   }
 
-  const data = await res.json().catch(() => ({}));
+  let data: any = {};
+  if (isJson) {
+    data = await res.json().catch(() => ({}));
+  } else if (!res.ok) {
+    // Consume body to avoid memory leaks
+    await res.text().catch(() => '');
+  }
+
   if (!res.ok) {
+    if (res.status === 502 || res.status === 504 || res.status === 503) {
+      throw new Error('Server is currently restarting or unavailable. Please try again in a few moments.');
+    }
     throw new Error(data.error || `Request failed with status ${res.status}`);
   }
   return data;
