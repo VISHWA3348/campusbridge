@@ -13,8 +13,10 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://campusbridge.zinoingroup.in';
+
 export const sendVerificationEmail = async (email, token) => {
-  const verifyUrl = `http://localhost:3000/verify?token=${token}`;
+  const verifyUrl = `${FRONTEND_URL}/verify?token=${token}`;
 
   const mailOptions = {
     from: `"CampusBridge" <${process.env.SMTP_USER}>`,
@@ -77,7 +79,7 @@ export const sendOTPEmail = async (email, otp) => {
 };
 
 export const sendNotificationEmail = async (email, { title, message, link }) => {
-  const actionUrl = link ? `http://localhost:3000${link}` : 'http://localhost:3000/dashboard';
+  const actionUrl = link ? `${FRONTEND_URL}${link}` : `${FRONTEND_URL}/dashboard`;
 
   const mailOptions = {
     from: `"CampusBridge" <${process.env.SMTP_USER}>`,
@@ -144,7 +146,7 @@ export const sendPasswordResetEmail = async (email, otp) => {
 };
 
 export const sendWelcomeEmail = async (email, { name, role, collegeName }) => {
-  const loginUrl = 'http://localhost:3000/login';
+  const loginUrl = `${FRONTEND_URL}/login`;
   const roleDisplay = role.replace('_', ' ');
 
   const mailOptions = {

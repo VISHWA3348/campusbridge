@@ -7,7 +7,7 @@ async function runTests() {
   
   try {
     // 1. Login as Super Admin
-    const loginRes = await fetch("http://localhost:5000/api/auth/login", {
+    const loginRes = await fetch("https://campusbridge-e4cv.onrender.com/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: "superadmin@test.com", password: "123456" })
@@ -63,7 +63,7 @@ async function runTests() {
 
     // --- TEST CASE 1: Successful creation with unique fields ---
     console.log("\n--- TEST 1: Unique College & Unique Admin Email ---");
-    const res1 = await fetch("http://localhost:5000/api/admin/colleges", {
+    const res1 = await fetch("https://campusbridge-e4cv.onrender.com/api/admin/colleges", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -87,7 +87,7 @@ async function runTests() {
       ...collegeDataTemplate,
       adminEmail: `another_${timestamp}@testcollege.edu` // unique email, but duplicate code
     };
-    const res2 = await fetch("http://localhost:5000/api/admin/colleges", {
+    const res2 = await fetch("https://campusbridge-e4cv.onrender.com/api/admin/colleges", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -111,7 +111,7 @@ async function runTests() {
       ...collegeDataTemplate,
       collegeCode: "NEW" + timestamp.toString().slice(-6) // unique code, but duplicate admin email
     };
-    const res3 = await fetch("http://localhost:5000/api/admin/colleges", {
+    const res3 = await fetch("https://campusbridge-e4cv.onrender.com/api/admin/colleges", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -140,7 +140,7 @@ async function runTests() {
       adminEmail: "" // empty admin email -> will throw validation error or DB constraint issue
     };
     
-    const res4 = await fetch("http://localhost:5000/api/admin/colleges", {
+    const res4 = await fetch("https://campusbridge-e4cv.onrender.com/api/admin/colleges", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -153,7 +153,7 @@ async function runTests() {
     console.log("Response Payload:", JSON.stringify(body4, null, 2));
 
     // Now query the DB / college list to verify that the college was NOT created at all!
-    const verifyRes = await fetch("http://localhost:5000/api/admin/colleges", {
+    const verifyRes = await fetch("https://campusbridge-e4cv.onrender.com/api/admin/colleges", {
       headers: { "Authorization": `Bearer ${token}` }
     });
     const colleges = await verifyRes.json();

@@ -395,7 +395,7 @@ export default function SignupCodesPage() {
             
             <div className="bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100 mb-8 inline-block mx-auto">
               <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`${(typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')}/signup/${selectedCode.role.toLowerCase()}?code=${selectedCode.code}`)}`} 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`${(process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://campusbridge.zinoingroup.in')}/signup/${selectedCode.role.toLowerCase()}?code=${selectedCode.code}`)}`} 
                 alt="QR Code" 
                 className="w-48 h-48 mx-auto"
               />
@@ -404,7 +404,7 @@ export default function SignupCodesPage() {
             <div className="bg-indigo-50 p-4 rounded-2xl mb-8">
               <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Signup URL</p>
               <p className="text-xs font-bold text-indigo-700 break-all">
-                {`${(typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')}/signup/${selectedCode.role.toLowerCase()}?code=${selectedCode.code}`}
+                {`${(process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://campusbridge.zinoingroup.in')}/signup/${selectedCode.role.toLowerCase()}?code=${selectedCode.code}`}
               </p>
             </div>
             
@@ -416,7 +416,7 @@ export default function SignupCodesPage() {
                 Close
               </button>
               <a 
-                href={`https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(`${(typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')}/signup/${selectedCode.role.toLowerCase()}?code=${selectedCode.code}`)}`}
+                href={`https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(`${(process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://campusbridge.zinoingroup.in')}/signup/${selectedCode.role.toLowerCase()}?code=${selectedCode.code}`)}`}
                 download={`QR_${selectedCode.code}.png`}
                 target="_blank"
                 className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-2"

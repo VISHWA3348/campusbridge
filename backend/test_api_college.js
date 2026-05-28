@@ -4,7 +4,7 @@ async function runTest() {
   console.log("Starting API college creation test...");
   try {
     // 1. Login
-    const loginRes = await fetch("http://localhost:5000/api/auth/login", {
+    const loginRes = await fetch("https://campusbridge-e4cv.onrender.com/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: "superadmin@test.com", password: "123456" })
@@ -54,7 +54,7 @@ async function runTest() {
       inviteCodeStatus: true
     };
 
-    const createRes = await fetch("http://localhost:5000/api/admin/colleges", {
+    const createRes = await fetch("https://campusbridge-e4cv.onrender.com/api/admin/colleges", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -10,7 +10,7 @@ const users = [
 async function testLogins() {
   for (const user of users) {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('https://campusbridge-e4cv.onrender.com/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email, password: '123456' })

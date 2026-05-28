@@ -38,9 +38,7 @@ const httpServer = createServer(app);
 
 const ALLOWED_ORIGINS = [
   "https://campusbridge.pages.dev",
-  "https://campusbridge.zinoingroup.in",
-  "http://localhost:3000",
-  "http://localhost:3001"
+  "https://campusbridge.zinoingroup.in"
 ];
 
 const io = new Server(httpServer, {
@@ -211,7 +209,7 @@ connectWithRetry()
     console.log('◇ Database connected successfully');
     httpServer.listen(PORT, () => {
       console.log(`◇ Server is running on port ${PORT}`);
-      console.log(`◇ http://localhost:${PORT}`);
+      console.log(`◇ Backend active`);
     });
   })
   .catch((err) => {

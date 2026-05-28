@@ -5,7 +5,7 @@ async function testForgotPassword() {
   
   try {
     console.log('Testing Forgot Password...');
-    const forgotRes = await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
+    const forgotRes = await axios.post('https://campusbridge-e4cv.onrender.com/api/auth/forgot-password', { email });
     console.log('Forgot Password response:', forgotRes.data);
 
     // Note: I can't easily get the OTP from email in this script without checking DB
@@ -13,7 +13,7 @@ async function testForgotPassword() {
     console.log('Testing Rate Limiting...');
     for (let i = 0; i < 4; i++) {
       try {
-        const res = await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
+        const res = await axios.post('https://campusbridge-e4cv.onrender.com/api/auth/forgot-password', { email });
         console.log(`Request ${i+2} successful`);
       } catch (e) {
         console.log(`Request ${i+2} failed as expected:`, e.response?.data?.error);

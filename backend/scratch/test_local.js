@@ -1,5 +1,5 @@
 async function runDiagnostics() {
-  const API = 'http://localhost:5000/api';
+  const API = 'https://campusbridge-e4cv.onrender.com/api';
   console.log('--- LOCAL DIAGNOSTIC START ---');
   
   try {
