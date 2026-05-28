@@ -85,7 +85,7 @@ export default function CollegeAdminSettings() {
       } else {
         await refreshUser();
       }
-      
+
       setMessage('Settings updated successfully!');
     } catch (err: any) {
       setMessage(err.message);

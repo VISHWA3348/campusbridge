@@ -17,15 +17,15 @@ export default function AlumniProfile() {
       fetch(baseUrl + '/profile/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-      .then(res => res.json())
-      .then(data => {
-        setProfileData(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+        .then(res => res.json())
+        .then(data => {
+          setProfileData(data);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error(err);
+          setLoading(false);
+        });
     }
   }, [token]);
 

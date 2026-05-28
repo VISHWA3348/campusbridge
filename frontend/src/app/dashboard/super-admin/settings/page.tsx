@@ -27,71 +27,71 @@ export default function SuperAdminSettings() {
     if (user && token) {
       const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
       const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
-      
+
       // Fetch profile
       fetch(baseUrl + '/profile/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-      .then(async res => {
-        if (!res.ok) throw new Error('Failed to fetch profile');
-        const contentType = res.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          return res.json();
-        }
-        throw new Error('Non-JSON response');
-      })
-      .then(data => {
-        setPersonalData({
-          name: data.name || '',
-          bio: data.bio || ''
-        });
-      })
-      .catch(err => console.error('Error fetching profile:', err));
+        .then(async res => {
+          if (!res.ok) throw new Error('Failed to fetch profile');
+          const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            return res.json();
+          }
+          throw new Error('Non-JSON response');
+        })
+        .then(data => {
+          setPersonalData({
+            name: data.name || '',
+            bio: data.bio || ''
+          });
+        })
+        .catch(err => console.error('Error fetching profile:', err));
 
       // Fetch global platform settings
       fetch(baseUrl + '/admin/settings', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-      .then(res => res.json())
-      .then(data => {
-        if (data.platformName) {
-          setPlatformName(data.platformName);
-        }
-        if (Array.isArray(data.features)) {
-          const map = (name: string) => {
-            const n = name.toLowerCase();
-            if (n === 'chat system' || n === 'chat' || n === 'real-time chat') return 'chat';
-            if (n === 'job portal' || n === 'jobs' || n === 'job postings') return 'jobs';
-            if (n === 'webinar module' || n === 'webinars' || n === 'webinar portal') return 'webinars';
-            if (n === 'referral system' || n === 'referrals') return 'referrals';
-            return null;
-          };
-          
-          setFeatures(prev => prev.map(f => {
-            const dbFeat = data.features.find((df: any) => map(df.featureName) === f.id);
-            return dbFeat ? { ...f, enabled: dbFeat.enabled } : f;
-          }));
-        }
-      })
-      .catch(err => console.error(err));
+        .then(res => res.json())
+        .then(data => {
+          if (data.platformName) {
+            setPlatformName(data.platformName);
+          }
+          if (Array.isArray(data.features)) {
+            const map = (name: string) => {
+              const n = name.toLowerCase();
+              if (n === 'chat system' || n === 'chat' || n === 'real-time chat') return 'chat';
+              if (n === 'job portal' || n === 'jobs' || n === 'job postings') return 'jobs';
+              if (n === 'webinar module' || n === 'webinars' || n === 'webinar portal') return 'webinars';
+              if (n === 'referral system' || n === 'referrals') return 'referrals';
+              return null;
+            };
+
+            setFeatures(prev => prev.map(f => {
+              const dbFeat = data.features.find((df: any) => map(df.featureName) === f.id);
+              return dbFeat ? { ...f, enabled: dbFeat.enabled } : f;
+            }));
+          }
+        })
+        .catch(err => console.error(err));
     }
   }, [user, token]);
 
   const toggleFeature = async (id: string) => {
     // Instantly update local UI state
     setFeatures(prev => prev.map(f => f.id === id ? { ...f, enabled: !f.enabled } : f));
-    
+
     // Call server to toggle feature
     try {
       const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
       const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
-      
+
       const activeToken = localStorage.getItem("token") || token;
       const res = await fetch(`${baseUrl}/admin/features/${id}/toggle`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${activeToken}` }
       });
-      
+
       if (!res.ok) {
         throw new Error('Failed to update feature toggle on server');
       }
@@ -107,7 +107,7 @@ export default function SuperAdminSettings() {
     e.preventDefault();
     setLoading(true);
     setMessage('');
-    
+
     try {
       const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
       const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
@@ -117,13 +117,13 @@ export default function SuperAdminSettings() {
       // 1. Update personal profile
       const res = await fetch(baseUrl + '/profile/me', {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${activeToken}`
         },
         body: JSON.stringify(personalData)
       });
-      
+
       let profileData: any = {};
       try {
         profileData = await res.json();
@@ -161,9 +161,9 @@ export default function SuperAdminSettings() {
 
       if (user && token) {
         if (profileData.user && updateUser) {
-           updateUser(profileData.user);
+          updateUser(profileData.user);
         } else {
-           await refreshUser();
+          await refreshUser();
         }
       }
 
@@ -214,11 +214,11 @@ export default function SuperAdminSettings() {
           {/* Personal Profile Section */}
           <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50">
             <h3 className="text-xl font-black text-slate-900 mb-8">Personal Profile</h3>
-            
-            <ImageUpload 
-              currentImage={user?.profilePhoto} 
-              onUpload={handlePhotoUpload} 
-              onRemove={handlePhotoRemove} 
+
+            <ImageUpload
+              currentImage={user?.profilePhoto}
+              onUpload={handlePhotoUpload}
+              onRemove={handlePhotoRemove}
             />
 
             <div className="space-y-6">
@@ -252,13 +252,13 @@ export default function SuperAdminSettings() {
           {/* Platform Controls */}
           <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50">
             <h3 className="text-xl font-black text-slate-900 mb-8">Platform Control</h3>
-            
+
             <div className="space-y-8">
               <div>
                 <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Platform Name</label>
                 <div className="relative">
                   <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4" />
-                  <input 
+                  <input
                     type="text" required
                     className="w-full pl-11 pr-4 py-4 bg-slate-50 rounded-2xl border-2 border-transparent focus:border-indigo-500 focus:bg-white outline-none transition-all font-bold text-sm"
                     value={platformName}
@@ -278,7 +278,7 @@ export default function SuperAdminSettings() {
                         </div>
                         <span className="font-bold text-sm text-slate-700">{feature.name}</span>
                       </div>
-                      <button 
+                      <button
                         type="button"
                         onClick={() => toggleFeature(feature.id)}
                         className="transition-transform active:scale-95"
@@ -298,7 +298,7 @@ export default function SuperAdminSettings() {
             </div>
           )}
 
-          <button 
+          <button
             type="submit"
             disabled={loading}
             className="w-full md:w-auto flex items-center justify-center gap-3 bg-slate-900 text-white px-10 py-5 rounded-[2rem] font-black text-sm hover:bg-slate-800 transition-all shadow-2xl shadow-slate-200 disabled:opacity-50"

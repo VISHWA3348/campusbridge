@@ -121,7 +121,7 @@ export default function StudentSettings() {
       } else {
         await refreshUser();
       }
-      
+
       setMessage('Settings updated successfully!');
     } catch (err: any) {
       setMessage(err.message);
@@ -165,14 +165,14 @@ export default function StudentSettings() {
   const handleProofUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     setLoading(true);
     try {
       const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
       const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
       const formData = new FormData();
       formData.append('proof', file);
-      
+
       const uploadRes = await fetch(baseUrl + '/verification/upload-proof', {
         method: 'POST',
         body: formData
@@ -182,18 +182,18 @@ export default function StudentSettings() {
 
       const updateRes = await fetch(baseUrl + '/profile/re-verify', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           idProofUrl: uploadData.fileUrl,
           idProofPublicId: uploadData.publicId
         })
       });
 
       if (!updateRes.ok) throw new Error('Failed to submit for re-verification');
-      
+
       await refreshUser();
       setMessage('New ID proof submitted for verification.');
     } catch (err: any) {
@@ -270,34 +270,34 @@ export default function StudentSettings() {
                   <ShieldCheck className="w-3 h-3" /> Identity Verification Status
                 </h3>
                 <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                   <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${user?.verificationStatus === 'APPROVED' ? 'bg-emerald-50 text-emerald-600' : user?.verificationStatus === 'REJECTED' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
-                         {user?.verificationStatus === 'APPROVED' ? <CheckCircle2 className="w-6 h-6" /> : user?.verificationStatus === 'REJECTED' ? <XCircle className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
-                      </div>
-                      <div>
-                         <p className="text-sm font-black text-slate-900">{user?.verificationStatus?.replace('_', ' ') || 'PENDING'}</p>
-                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID Card Proof</p>
-                      </div>
-                   </div>
-                   <div className="flex gap-3">
-                      {user?.idProofUrl && <a href={user.idProofUrl} target="_blank" rel="noreferrer" className="text-[10px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl hover:bg-indigo-100 transition-all">View Current</a>}
-                      {user?.verificationStatus === 'REJECTED' && (
-                        <button 
-                          type="button"
-                          onClick={() => proofInputRef.current?.click()}
-                          className="text-[10px] font-black uppercase tracking-widest text-white bg-red-600 px-4 py-2 rounded-xl shadow-lg shadow-red-100 hover:bg-red-700 transition-all flex items-center gap-2"
-                        >
-                          <Upload className="w-3 h-3" /> Re-upload
-                        </button>
-                      )}
-                      <input 
-                        type="file"
-                        ref={proofInputRef}
-                        onChange={handleProofUpload}
-                        accept=".jpg,.jpeg,.png,.pdf"
-                        className="hidden"
-                      />
-                   </div>
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${user?.verificationStatus === 'APPROVED' ? 'bg-emerald-50 text-emerald-600' : user?.verificationStatus === 'REJECTED' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
+                      {user?.verificationStatus === 'APPROVED' ? <CheckCircle2 className="w-6 h-6" /> : user?.verificationStatus === 'REJECTED' ? <XCircle className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-slate-900">{user?.verificationStatus?.replace('_', ' ') || 'PENDING'}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID Card Proof</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    {user?.idProofUrl && <a href={user.idProofUrl} target="_blank" rel="noreferrer" className="text-[10px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl hover:bg-indigo-100 transition-all">View Current</a>}
+                    {user?.verificationStatus === 'REJECTED' && (
+                      <button
+                        type="button"
+                        onClick={() => proofInputRef.current?.click()}
+                        className="text-[10px] font-black uppercase tracking-widest text-white bg-red-600 px-4 py-2 rounded-xl shadow-lg shadow-red-100 hover:bg-red-700 transition-all flex items-center gap-2"
+                      >
+                        <Upload className="w-3 h-3" /> Re-upload
+                      </button>
+                    )}
+                    <input
+                      type="file"
+                      ref={proofInputRef}
+                      onChange={handleProofUpload}
+                      accept=".jpg,.jpeg,.png,.pdf"
+                      className="hidden"
+                    />
+                  </div>
                 </div>
                 {user?.verificationStatus === 'REJECTED' && (
                   <p className="mt-3 px-4 text-[10px] font-bold text-red-500 italic">Reason: {user.rejectionReason}</p>

@@ -100,6 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      // Import fetchMyProfile dynamically or use global fetch to avoid circular deps if any
       const res = await fetch(`${API_BASE}/profile/me`, {
         headers: { 'Authorization': `Bearer ${currentToken}` }
       });

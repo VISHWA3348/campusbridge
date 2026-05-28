@@ -1,5 +1,5 @@
 const rawApiUrl = (process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api');
-const API_BASE_URL = rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl}/api`;
+export const API_BASE_URL = rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl}/api`;
 
 const getHeaders = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -847,3 +847,76 @@ export function getFileUrl(url: string | null | undefined): string | null {
   return `${baseUrl.replace(/\/api$/, '')}/${url}`;
 }
 
+// --- Common Profile & Settings ---
+export async function fetchMyProfile() {
+  const res = await fetch(`${API_BASE_URL}/profile/me`, { headers: getHeaders() });
+  return handleResponse(res, `${API_BASE_URL}/profile/me`);
+}
+
+export async function updateMyProfile(data: any) {
+  const res = await fetch(`${API_BASE_URL}/profile/me`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(data)
+  });
+  return handleResponse(res, `${API_BASE_URL}/profile/me`);
+}
+
+export async function uploadProfilePhoto(formData: FormData) {
+  const res = await fetch(`${API_BASE_URL}/profile/photo`, {
+    method: 'POST',
+    headers: {
+      'Authorization': getHeaders().Authorization!
+    },
+    body: formData
+  });
+  return handleResponse(res, `${API_BASE_URL}/profile/photo`);
+}
+
+export async function removeProfilePhoto() {
+  const res = await fetch(`${API_BASE_URL}/profile/photo`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  });
+  return handleResponse(res, `${API_BASE_URL}/profile/photo`);
+}
+
+export async function fetchNotificationSettings() {
+  const res = await fetch(`${API_BASE_URL}/notifications/settings`, { headers: getHeaders() });
+  return handleResponse(res, `${API_BASE_URL}/notifications/settings`);
+}
+
+export async function updateNotificationSettings(data: any) {
+  const res = await fetch(`${API_BASE_URL}/notifications/settings`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(data)
+  });
+  return handleResponse(res, `${API_BASE_URL}/notifications/settings`);
+}
+
+// --- College Admin Invite Codes ---
+export async function toggleCollegeInviteCode(id: number) {
+  const res = await fetch(`${API_BASE_URL}/admin/colleges/${id}/toggle-invite-code`, {
+    method: 'PATCH',
+    headers: getHeaders()
+  });
+  return handleResponse(res, `${API_BASE_URL}/admin/colleges/${id}/toggle-invite-code`);
+}
+
+export async function regenerateCollegeInviteCode(id: number) {
+  const res = await fetch(`${API_BASE_URL}/admin/colleges/${id}/regenerate-invite-code`, {
+    method: 'PATCH',
+    headers: getHeaders()
+  });
+  return handleResponse(res, `${API_BASE_URL}/admin/colleges/${id}/regenerate-invite-code`);
+}
+
+export async function toggleSignupCodeStatus(codeId: number, status: string) {
+  const res = await fetch(`${API_BASE_URL}/admin/signup-codes/${codeId}`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify({ status })
+  });
+  return handleResponse(res, `${API_BASE_URL}/admin/signup-codes/${codeId}`);
+}
