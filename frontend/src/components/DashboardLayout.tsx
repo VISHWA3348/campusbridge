@@ -51,7 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const fetchNotifications = async () => {
     if (!user) return;
-    const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/notifications', {
+    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/notifications', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
     try {
@@ -68,7 +68,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const fetchUnreadCount = async () => {
     if (!user) return;
     try {
-      const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/messages/conversations', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/messages/conversations', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const contentType = res.headers.get('content-type');
@@ -85,7 +85,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     fetchNotifications();
     fetchUnreadCount();
 
-    const socket = io((((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))).replace(/\/api$/, '')));
+    const socket = io(((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api').replace(/\/api$/, '')));
     socket.emit('join', user.id);
 
     socket.on('new_notification', (notification) => {
@@ -132,7 +132,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const search = async () => {
       if (searchQuery.length > 2) {
         setIsSearching(true);
-        const res = await fetch(`${(typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))}/global/search?q=${searchQuery}`, {
+        const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/global/search?q=${searchQuery}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         const contentType = res.headers.get('content-type');
@@ -155,7 +155,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!showNotifications) {
       setShowNotifications(true);
       // Mark all as read
-      await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/notifications/read', {
+      await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/notifications/read', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
@@ -170,7 +170,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        const res = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/admin/features', {
+        const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/admin/features', {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         const contentType = res.headers.get('content-type');
@@ -450,7 +450,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <button
                       onClick={async (e) => {
                         e.stopPropagation();
-                        await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/notifications/read', {
+                        await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/notifications/read', {
                           method: 'POST',
                           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                         });

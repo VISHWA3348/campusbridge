@@ -1,4 +1,4 @@
-const API_BASE_URL = (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'));
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
 
 const getHeaders = () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -829,7 +829,7 @@ export async function fetchNotifications() {
 export function getFileUrl(url: string | null | undefined): string | null {
   if (!url) return null;
   if (url.startsWith('http')) return url;
-  const baseUrl = (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'));
+  const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
   return `${baseUrl.replace(/\/api$/, '')}/${url}`;
 }
 

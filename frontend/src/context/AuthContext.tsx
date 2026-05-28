@@ -29,13 +29,7 @@ interface AuthContextType {
   loading: boolean;
 }
 
-const API_BASE = typeof window !== 'undefined' && 
-  window.location.hostname !== 'localhost' && 
-  window.location.hostname !== '127.0.0.1'
-  ? 'https://campusbridge-e4cv.onrender.com/api'
-  : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' 
-    ? process.env.NEXT_PUBLIC_API_URL 
-    : 'http://localhost:5000/api');
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

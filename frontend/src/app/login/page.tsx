@@ -28,7 +28,7 @@ function LoginForm() {
     setLoading(true);
     setError('');
     try {
-      const baseUrl = (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'));
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
       const res = await fetch(baseUrl + '/auth/google-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -76,7 +76,7 @@ function LoginForm() {
     setError('');
 
     try {
-      const baseUrl = (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'));
+      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
       const res = await fetch(baseUrl + '/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

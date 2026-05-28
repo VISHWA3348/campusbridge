@@ -47,7 +47,7 @@ export default function StudentJobsPage() {
         workType: selectedWorkType
       });
 
-      const res = await fetch(`${(typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))}/jobs?${query}`, {
+      const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/jobs?${query}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

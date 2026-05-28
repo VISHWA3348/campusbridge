@@ -43,7 +43,7 @@ export default function SuperAdminDashboard() {
         setStats(statsData);
         
         const token = localStorage.getItem('token');
-        const featRes = await fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/admin/features', {
+        const featRes = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/admin/features', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const featData = await featRes.json();

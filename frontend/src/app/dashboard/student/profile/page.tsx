@@ -12,7 +12,7 @@ export default function StudentProfile() {
 
   useEffect(() => {
     if (token) {
-      fetch(((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api'))) + '/profile/me', {
+      fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/profile/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(res => res.json())
