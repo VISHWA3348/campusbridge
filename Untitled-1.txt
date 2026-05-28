@@ -1,0 +1,3 @@
+# 
+
+{"jwtSecretSet":true,"jwtSecretLength":11,"nodeEnv":"production","port":"5000","dbUrlSet":true,"timestamp":"2026-05-27T08:26:41.479Z"}
