@@ -28,7 +28,8 @@ function LoginForm() {
     setLoading(true);
     setError('');
     try {
-      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
+      const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api';
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
       
       let res: Response;
       try {
@@ -93,7 +94,8 @@ function LoginForm() {
     setError('');
 
     try {
-      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
+      const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api';
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
       
       let res: Response;
       try {
