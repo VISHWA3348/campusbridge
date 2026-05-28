@@ -11,7 +11,8 @@ export default function NotificationSettings() {
 
   const fetchSettings = async () => {
     try {
-      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
       const res = await fetch(baseUrl + '/notifications/settings', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
@@ -72,9 +73,10 @@ export default function NotificationSettings() {
         chatPush: settings.find(s => s.type === 'CHATS')?.push || false,
       };
 
-      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
       const res = await fetch(baseUrl + '/notifications/settings', {
-        method: 'POST',
+        method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'

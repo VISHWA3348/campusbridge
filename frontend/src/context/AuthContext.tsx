@@ -29,7 +29,8 @@ interface AuthContextType {
   loading: boolean;
 }
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
+const rawApiBase = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+const API_BASE = rawApiBase.endsWith('/api') ? rawApiBase : `${rawApiBase}/api`;
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

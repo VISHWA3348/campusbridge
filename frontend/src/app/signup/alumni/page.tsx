@@ -45,7 +45,9 @@ export default function AlumniSignup() {
       validateInviteCode(code.toUpperCase());
     }
 
-    fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/auth/colleges')
+    const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+    const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+    fetch(baseUrl + '/auth/colleges')
       .then(res => res.json())
       .then(data => setColleges(data))
       .catch(err => console.error('Failed to load colleges', err));
@@ -106,7 +108,9 @@ export default function AlumniSignup() {
     setCodeSuccess(false);
 
     try {
-      const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/auth/validate-invite-code?code=${code}&role=ALUMNI`);
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      const res = await fetch(`${baseUrl}/auth/validate-invite-code?code=${code}&role=ALUMNI`);
       const data = await res.json();
 
       if (!res.ok) {
@@ -147,7 +151,10 @@ export default function AlumniSignup() {
       const fileFormData = new FormData();
       fileFormData.append('proof', selectedFile);
 
-      const uploadRes = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/verification/upload-proof', {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      
+      const uploadRes = await fetch(baseUrl + '/verification/upload-proof', {
         method: 'POST',
         body: fileFormData
       });
@@ -161,7 +168,7 @@ export default function AlumniSignup() {
         alumniProofPublicId: uploadData.publicId
       };
 
-      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/auth/signup', {
+      const res = await fetch(baseUrl + '/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalFormData)
@@ -178,7 +185,9 @@ export default function AlumniSignup() {
 
   const handleVerifyOTP = async (otp: string) => {
     try {
-      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/auth/verify-otp', {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      const res = await fetch(baseUrl + '/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email, otp })
@@ -194,7 +203,9 @@ export default function AlumniSignup() {
 
   const handleResendOTP = async () => {
     try {
-      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/auth/resend-otp', {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      const res = await fetch(baseUrl + '/auth/resend-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email })

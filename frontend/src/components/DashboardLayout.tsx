@@ -51,7 +51,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const fetchNotifications = async () => {
     if (!user) return;
-    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/notifications', {
+    const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+    const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+    const res = await fetch(baseUrl + '/notifications', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
     try {
@@ -68,7 +70,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const fetchUnreadCount = async () => {
     if (!user) return;
     try {
-      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/messages/conversations', {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      const res = await fetch(baseUrl + '/messages/conversations', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const contentType = res.headers.get('content-type');
@@ -84,8 +88,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!user) return;
     fetchNotifications();
     fetchUnreadCount();
-
-    const socket = io(((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api').replace(/\/api$/, '')));
+    
+    const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api');
+    const socketUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl.replace(/\/api$/, '') : rawBaseUrl;
+    const socket = io(socketUrl);
     socket.emit('join', user.id);
 
     socket.on('new_notification', (notification) => {
@@ -132,7 +138,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const search = async () => {
       if (searchQuery.length > 2) {
         setIsSearching(true);
-        const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/global/search?q=${searchQuery}`, {
+        const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+        const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+        const res = await fetch(`${baseUrl}/global/search?q=${searchQuery}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         const contentType = res.headers.get('content-type');
@@ -155,7 +163,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!showNotifications) {
       setShowNotifications(true);
       // Mark all as read
-      await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/notifications/read', {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      await fetch(baseUrl + '/notifications/read', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
@@ -170,7 +180,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     const fetchFeatures = async () => {
       try {
-        const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/admin/features', {
+        const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+        const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+        const res = await fetch(baseUrl + '/admin/features', {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         const contentType = res.headers.get('content-type');
@@ -450,7 +462,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <button
                       onClick={async (e) => {
                         e.stopPropagation();
-                        await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/notifications/read', {
+                        const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+                        const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+                        await fetch(baseUrl + '/notifications/read', {
                           method: 'POST',
                           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                         });

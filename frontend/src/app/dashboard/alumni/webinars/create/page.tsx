@@ -50,7 +50,7 @@ function CreateWebinarPageContent() {
   const fetchWebinarDetails = async () => {
     setFetching(true);
     try {
-      const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/webinars/alumni`, {
+      const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api')}/webinars/alumni`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const webinars = await res.json();
@@ -86,8 +86,8 @@ function CreateWebinarPageContent() {
 
     try {
       const url = editId 
-        ? `${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/webinars/${editId}` 
-        : (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/webinars';
+        ? `${(process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api')}/webinars/${editId}` 
+        : (process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api') + '/webinars';
       
       const method = editId ? 'PUT' : 'POST';
 

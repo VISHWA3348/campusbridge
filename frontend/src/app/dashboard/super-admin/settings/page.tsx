@@ -25,7 +25,8 @@ export default function SuperAdminSettings() {
 
   useEffect(() => {
     if (user && token) {
-      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
       
       // Fetch profile
       fetch(baseUrl + '/profile/me', {
@@ -82,7 +83,8 @@ export default function SuperAdminSettings() {
     
     // Call server to toggle feature
     try {
-      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
       
       const activeToken = localStorage.getItem("token") || token;
       const res = await fetch(`${baseUrl}/admin/features/${id}/toggle`, {
@@ -107,7 +109,8 @@ export default function SuperAdminSettings() {
     setMessage('');
     
     try {
-      const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
 
       const activeToken = localStorage.getItem("token") || token;
 
@@ -173,7 +176,8 @@ export default function SuperAdminSettings() {
   };
 
   const handlePhotoUpload = async (file: File) => {
-    const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
+    const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+    const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
     const fd = new FormData();
     fd.append('photo', file);
     const res = await fetch(baseUrl + '/profile/photo', {
@@ -187,7 +191,8 @@ export default function SuperAdminSettings() {
   };
 
   const handlePhotoRemove = async () => {
-    const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
+    const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+    const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
     const res = await fetch(baseUrl + '/profile/photo', {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }

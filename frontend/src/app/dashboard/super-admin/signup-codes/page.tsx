@@ -36,10 +36,10 @@ export default function SignupCodesPage() {
   const fetchData = async () => {
     try {
       const [codesRes, collegesRes] = await Promise.all([
-        fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/admin/signup-codes', {
+        fetch((process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api') + '/admin/signup-codes', {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         }),
-        fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/auth/colleges')
+        fetch((process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api') + '/auth/colleges')
       ]);
       const codesData = await codesRes.json();
       const collegesData = await collegesRes.json();
@@ -56,7 +56,7 @@ export default function SignupCodesPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/admin/signup-codes', {
+      const res = await fetch((process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api') + '/admin/signup-codes', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ export default function SignupCodesPage() {
   const handleDelete = async (id: number) => {
     if (!confirm('Are you sure you want to delete this code?')) return;
     try {
-      await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/admin/signup-codes/${id}`, {
+      await fetch(`${(process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api')}/admin/signup-codes/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
@@ -96,7 +96,7 @@ export default function SignupCodesPage() {
   const toggleStatus = async (code: any) => {
     const newStatus = code.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE';
     try {
-      await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/admin/signup-codes/${code.id}`, {
+      await fetch(`${(process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api')}/admin/signup-codes/${code.id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',

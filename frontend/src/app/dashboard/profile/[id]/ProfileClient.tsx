@@ -15,7 +15,7 @@ export default function ProfileClient() {
 
   useEffect(() => {
     if (token && params.id) {
-      fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/profile/${params.id}`, {
+      fetch(`${(process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api')}/profile/${params.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => {

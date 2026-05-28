@@ -174,7 +174,9 @@ export default function CollegesPage() {
   const handleToggleInviteCode = async (id: number) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/admin/colleges/${id}/toggle-invite-code`, {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      await fetch(`${baseUrl}/admin/colleges/${id}/toggle-invite-code`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -188,7 +190,9 @@ export default function CollegesPage() {
     if (!confirm('Are you sure you want to regenerate the invite code? The old code will no longer work.')) return;
     try {
       const token = localStorage.getItem('token');
-      await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/admin/colleges/${id}/regenerate-invite-code`, {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      await fetch(`${baseUrl}/admin/colleges/${id}/regenerate-invite-code`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -204,7 +208,9 @@ export default function CollegesPage() {
     setLoadingCodes(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/admin/signup-codes?collegeId=${college.id}`, {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      const res = await fetch(`${baseUrl}/admin/signup-codes?collegeId=${college.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -220,7 +226,9 @@ export default function CollegesPage() {
     try {
       const token = localStorage.getItem('token');
       const newStatus = currentStatus === 'ACTIVE' ? 'DISABLED' : 'ACTIVE';
-      await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/admin/signup-codes/${codeId}`, {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      await fetch(`${baseUrl}/admin/signup-codes/${codeId}`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${token}`,

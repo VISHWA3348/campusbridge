@@ -23,7 +23,9 @@ export default function CollegeAdminSettings() {
   useEffect(() => {
     if (user) {
       // Fetch user profile for personal details
-      fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/profile/me`, {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      fetch(`${baseUrl}/profile/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(async res => {
@@ -56,7 +58,9 @@ export default function CollegeAdminSettings() {
 
     try {
       // Update personal profile
-      const profileRes = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/profile/me', {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      const profileRes = await fetch(baseUrl + '/profile/me', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +97,9 @@ export default function CollegeAdminSettings() {
   const handlePhotoUpload = async (file: File) => {
     const fd = new FormData();
     fd.append('photo', file);
-    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/profile/photo', {
+    const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+    const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+    const res = await fetch(baseUrl + '/profile/photo', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
       body: fd
@@ -104,7 +110,9 @@ export default function CollegeAdminSettings() {
   };
 
   const handlePhotoRemove = async () => {
-    const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/profile/photo', {
+    const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+    const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+    const res = await fetch(baseUrl + '/profile/photo', {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });

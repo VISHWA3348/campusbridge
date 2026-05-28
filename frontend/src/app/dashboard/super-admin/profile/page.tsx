@@ -7,7 +7,8 @@ import { useAuth } from '@/context/AuthContext';
 import { ShieldCheck, User, Mail, LogIn, RefreshCw, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
+const rawApiBase = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+const API_BASE = rawApiBase.endsWith('/api') ? rawApiBase : `${rawApiBase}/api`;
 
 /** Check if a JWT token is expired client-side */
 function isTokenExpired(token: string): boolean {

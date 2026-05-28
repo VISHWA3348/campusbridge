@@ -16,7 +16,9 @@ export default function NotificationCenter() {
   const fetchNotifications = async (pageNum = 1, reset = false) => {
     try {
       setLoading(true);
-      const res = await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/notifications?page=${pageNum}&limit=10&unreadOnly=${activeTab === 'unread'}`, {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      const res = await fetch(`${baseUrl}/notifications?page=${pageNum}&limit=10&unreadOnly=${activeTab === 'unread'}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();
@@ -50,7 +52,9 @@ export default function NotificationCenter() {
   };
 
   const markAllRead = async () => {
-    await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/notifications/read', {
+    const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+    const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+    await fetch(baseUrl + '/notifications/read', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
@@ -58,7 +62,9 @@ export default function NotificationCenter() {
   };
 
   const deleteNotification = async (id: number) => {
-    await fetch(`${(process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api')}/notifications/${id}`, {
+    const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+    const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+    await fetch(`${baseUrl}/notifications/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
@@ -67,7 +73,9 @@ export default function NotificationCenter() {
 
   const clearAll = async () => {
     if (confirm('Clear all notifications?')) {
-      await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/notifications', {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      await fetch(baseUrl + '/notifications', {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });

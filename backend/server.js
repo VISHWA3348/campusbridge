@@ -133,7 +133,7 @@ app.post('/api/notifications/read', authenticate, markAsRead);
 app.delete('/api/notifications/:id', authenticate, deleteNotification);
 app.delete('/api/notifications', authenticate, clearAllNotifications);
 app.get('/api/notifications/settings', authenticate, getNotificationSettings);
-app.post('/api/notifications/settings', authenticate, updateNotificationSettings);
+app.put('/api/notifications/settings', authenticate, updateNotificationSettings);
 
 // Gamification & Leaderboard
 app.get('/api/gamification', authenticate, async (req, res) => {

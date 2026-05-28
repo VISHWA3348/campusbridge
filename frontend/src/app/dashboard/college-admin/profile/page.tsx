@@ -12,7 +12,9 @@ export default function CollegeAdminProfile() {
 
   useEffect(() => {
     if (token) {
-      fetch((process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api') + '/profile/me', {
+      const rawBaseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com');
+      const baseUrl = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
+      fetch(baseUrl + '/profile/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(res => res.json())
