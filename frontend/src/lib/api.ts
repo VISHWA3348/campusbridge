@@ -8,34 +8,50 @@ const getHeaders = () => {
   };
 };
 
+export const isTokenExpired = (token: string) => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+};
+
 const handleResponse = async (res: Response, url: string) => {
   const contentType = res.headers.get('content-type');
   const isJson = contentType && contentType.includes('application/json');
 
   if (res.status === 401) {
     if (!url.endsWith('/auth/login') && !url.endsWith('/auth/google-login')) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        if (!window.location.pathname.startsWith('/login')) {
-          window.location.href = '/login?expired=true';
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const expired = token ? isTokenExpired(token) : true;
+
+      if (expired) {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          if (!window.location.pathname.startsWith('/login')) {
+            window.location.href = '/login?expired=true';
+          }
         }
+        throw new Error('Session expired. Please login again.');
       }
-      
-      let data: any = {};
-      if (isJson) {
-        data = await res.json().catch(() => ({}));
-      }
-      throw new Error(data.error || 'Session expired. Please login again.');
+
+      // Temporary auth/backend issue
+      throw new Error('Temporary authentication/server issue. Please retry or refresh.');
     }
   }
 
   let data: any = {};
-  if (isJson) {
-    data = await res.json().catch(() => ({}));
-  } else if (!res.ok) {
-    // Consume body to avoid memory leaks
-    await res.text().catch(() => '');
+  try {
+    if (isJson) {
+      data = await res.json();
+    } else if (!res.ok) {
+      // Consume body to avoid memory leaks
+      await res.text().catch(() => '');
+    }
+  } catch {
+    throw new Error('Server returned an invalid response. Please retry.');
   }
 
   if (!res.ok) {

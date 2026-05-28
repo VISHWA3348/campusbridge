@@ -19,6 +19,7 @@ import {
 export default function CollegesPage() {
   const [colleges, setColleges] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
@@ -77,11 +78,13 @@ export default function CollegesPage() {
 
   const loadColleges = async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await fetchColleges();
       setColleges(Array.isArray(data) ? data : []);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setError(err.message || 'Unable to load colleges right now.');
       setColleges([]);
     } finally {
       setLoading(false);
@@ -289,9 +292,22 @@ export default function CollegesPage() {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {loading ? (
-                <tr><td colSpan={5} className="px-8 py-20 text-center">
+                <tr><td colSpan={6} className="px-8 py-20 text-center">
                   <div className="w-8 h-8 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                   <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Loading Network...</p>
+                </td></tr>
+              ) : error ? (
+                <tr><td colSpan={6} className="px-8 py-20 text-center">
+                  <div className="text-red-600 text-center">
+                    <p className="font-bold mb-2">Unable to load colleges right now.</p>
+                    <p className="text-sm opacity-80 mb-4">{error}</p>
+                    <button 
+                      onClick={loadColleges} 
+                      className="px-6 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors text-sm font-bold"
+                    >
+                      Try Again
+                    </button>
+                  </div>
                 </td></tr>
               ) : filteredColleges.map((college) => (
                 <tr key={college.id} className="hover:bg-slate-50/50 transition-colors group">
