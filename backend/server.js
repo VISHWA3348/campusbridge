@@ -208,10 +208,26 @@ app.use((req, res) => {
   res.status(404).json({ error: `Route not found: ${req.method} ${req.originalUrl}` });
 });
 
+// In-memory error logging for production diagnostics
+global.lastErrors = global.lastErrors || [];
+
+app.get('/api/debug/errors', (req, res) => {
+  res.json(global.lastErrors || []);
+});
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  global.lastErrors.push({
+    message: err.message,
+    stack: err.stack,
+    path: req.originalUrl,
+    method: req.method,
+    timestamp: new Date().toISOString()
+  });
+  if (global.lastErrors.length > 20) global.lastErrors.shift();
+  res.status(500).json({ error: 'Something went wrong!', details: err.message });
 });
+
 
 // Verify DB connection with retry logic (Render + Supabase safe)
 connectWithRetry()
