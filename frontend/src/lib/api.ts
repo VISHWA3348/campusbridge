@@ -43,20 +43,28 @@ const handleResponse = async (res: Response, url: string) => {
   }
 
   let data: any = {};
-  try {
-    if (isJson) {
+  if (isJson) {
+    try {
       data = await res.json();
-    } else if (!res.ok) {
-      // Consume body to avoid memory leaks
-      await res.text().catch(() => '');
+    } catch {
+      throw new Error('The server returned a malformed JSON response. Please try again in a moment.');
     }
-  } catch {
-    throw new Error('Server returned an invalid response. Please retry.');
+  } else {
+    // Non-JSON response — consume body and figure out what happened
+    const text = await res.text().catch(() => '');
+    if (res.status === 502 || res.status === 503 || res.status === 504) {
+      throw new Error('The server is currently starting up. Please wait about 30 seconds and try again.');
+    }
+    if (!res.ok) {
+      throw new Error(`The server returned an unexpected response (HTTP ${res.status}). Please try again shortly.`);
+    }
+    // 2xx but not JSON — return empty object to avoid crashing callers
+    return data;
   }
 
   if (!res.ok) {
     if (res.status === 502 || res.status === 504 || res.status === 503) {
-      throw new Error('Server is currently restarting or unavailable. Please try again in a few moments.');
+      throw new Error('The server is currently starting up. Please wait about 30 seconds and try again.');
     }
     throw new Error(data.error || `Request failed with status ${res.status}`);
   }
@@ -65,12 +73,17 @@ const handleResponse = async (res: Response, url: string) => {
 
 // --- Auth ---
 export async function login(credentials: any) {
-  const res = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(credentials)
-  });
-  return res.json();
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials)
+    });
+  } catch (networkErr) {
+    throw new Error('Unable to reach the server. The backend may be starting up — please wait 30 seconds and try again.');
+  }
+  return handleResponse(res, `${API_BASE_URL}/auth/login`);
 }
 
 // --- Global APIs ---

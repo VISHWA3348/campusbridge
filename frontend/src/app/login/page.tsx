@@ -29,11 +29,20 @@ function LoginForm() {
     setError('');
     try {
       const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
-      const res = await fetch(baseUrl + '/auth/google-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ credential: credentialResponse.credential })
-      });
+      
+      let res: Response;
+      try {
+        res = await fetch(baseUrl + '/auth/google-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: credentialResponse.credential })
+        });
+      } catch (networkErr: any) {
+        console.error('Google login network error:', networkErr);
+        throw new Error(
+          'Unable to reach the server. The backend may be starting up — please wait 30 seconds and try again.'
+        );
+      }
 
       let data: any = {};
       const contentType = res.headers.get('content-type');
@@ -42,12 +51,20 @@ function LoginForm() {
           data = await res.json();
         } catch (jsonErr) {
           console.error('Failed to parse Google login JSON:', jsonErr);
-          throw new Error('Server returned an invalid JSON response. Please try again.');
+          throw new Error('The server returned a malformed response. Please try again in a moment.');
         }
       } else {
         const text = await res.text();
-        console.error('Server returned non-JSON response:', text.substring(0, 200));
-        throw new Error('Server returned an invalid response. Please ensure the backend is running.');
+        console.error('Server returned non-JSON (status ' + res.status + '):', text.substring(0, 300));
+        
+        if (res.status === 502 || res.status === 503 || res.status === 504) {
+          throw new Error(
+            'The server is currently starting up. Please wait about 30 seconds and try again.'
+          );
+        }
+        throw new Error(
+          'The server returned an unexpected response (HTTP ' + res.status + '). Please try again shortly.'
+        );
       }
 
       if (!res.ok) {
@@ -77,25 +94,46 @@ function LoginForm() {
 
     try {
       const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://campusbridge-e4cv.onrender.com/api');
-      const res = await fetch(baseUrl + '/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+      
+      let res: Response;
+      try {
+        res = await fetch(baseUrl + '/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+      } catch (networkErr: any) {
+        // Network-level failure: server down, DNS failure, CORS preflight blocked, etc.
+        console.error('Login network error:', networkErr);
+        throw new Error(
+          'Unable to reach the server. The backend may be starting up — please wait 30 seconds and try again.'
+        );
+      }
 
+      // Server responded, but check what it actually sent back
       let data: any = {};
       const contentType = res.headers.get('content-type');
+
       if (contentType && contentType.includes('application/json')) {
         try {
           data = await res.json();
         } catch (jsonErr) {
           console.error('Failed to parse login JSON:', jsonErr);
-          throw new Error('Server returned an invalid JSON response. Please try again.');
+          throw new Error('The server returned a malformed response. Please try again in a moment.');
         }
       } else {
+        // The server (or Render's proxy during cold-start) returned HTML instead of JSON
         const text = await res.text();
-        console.error('Server returned non-JSON response:', text.substring(0, 200));
-        throw new Error('Server returned an invalid response. Please ensure the backend is running.');
+        console.error('Server returned non-JSON (status ' + res.status + '):', text.substring(0, 300));
+        
+        if (res.status === 502 || res.status === 503 || res.status === 504) {
+          throw new Error(
+            'The server is currently starting up. Please wait about 30 seconds and try again.'
+          );
+        }
+        throw new Error(
+          'The server returned an unexpected response (HTTP ' + res.status + '). Please try again shortly.'
+        );
       }
 
       if (!res.ok) {
@@ -107,7 +145,7 @@ function LoginForm() {
           router.push(`/auth/rejected?reason=${encodeURIComponent(data.rejectionReason || '')}`);
           return;
         }
-        throw new Error(data.error || 'Login failed. Please try again.');
+        throw new Error(data.error || 'Login failed. Please check your credentials and try again.');
       }
 
       handleLoginSuccess(data);

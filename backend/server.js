@@ -198,6 +198,16 @@ app.get('/api/debug/env-check', (req, res) => {
   });
 });
 
+// Health check endpoint (used by frontend to detect cold-starts)
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Catch-all 404 handler — ensures Express NEVER returns HTML for unknown routes
+app.use((req, res) => {
+  res.status(404).json({ error: `Route not found: ${req.method} ${req.originalUrl}` });
+});
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
