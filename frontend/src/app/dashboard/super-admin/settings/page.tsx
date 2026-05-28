@@ -84,9 +84,10 @@ export default function SuperAdminSettings() {
     try {
       const baseUrl = ((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api')));
       
+      const activeToken = localStorage.getItem("token") || token;
       const res = await fetch(`${baseUrl}/admin/features/${id}/toggle`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${activeToken}` }
       });
       
       if (!res.ok) {
@@ -108,40 +109,51 @@ export default function SuperAdminSettings() {
     try {
       const baseUrl = ((typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? 'https://campusbridge-e4cv.onrender.com/api' : (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== '/api' ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5000/api')));
 
+      const activeToken = localStorage.getItem("token") || token;
+
       // 1. Update personal profile
       const res = await fetch(baseUrl + '/profile/me', {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${activeToken}`
         },
         body: JSON.stringify(personalData)
       });
       
-      if (!res.ok) {
-        const contentType = res.headers.get('content-type');
-        let errMessage = 'Failed to update personal settings';
-        if (contentType && contentType.includes('application/json')) {
-          const errData = await res.json();
-          errMessage = errData.error || errMessage;
-        }
-        throw new Error(errMessage);
+      let profileData: any = {};
+      try {
+        profileData = await res.json();
+      } catch {
+        throw new Error("Server returned invalid response");
       }
-      
-      const profileData = await res.json();
+
+      if (!res.ok) {
+        throw new Error(profileData.error || 'Failed to update personal settings');
+      }
 
       // 2. Update platform name
       const platformRes = await fetch(baseUrl + '/admin/settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${activeToken}`
         },
         body: JSON.stringify({ platformName })
       });
 
+      let platformData: any = {};
+      try {
+        platformData = await platformRes.json();
+      } catch {
+        // Platform settings might return 204 or non-JSON, but let's handle if it's 401
+        if (!platformRes.ok) {
+          throw new Error("Server returned invalid response");
+        }
+      }
+
       if (!platformRes.ok) {
-        throw new Error('Failed to update platform settings');
+        throw new Error(platformData.error || 'Failed to update platform settings');
       }
 
       if (user && token) {

@@ -82,21 +82,19 @@ export default function NotificationSettings() {
         body: JSON.stringify(payload)
       });
       
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        if (!res.ok) {
+          throw new Error("Server returned invalid response");
+        }
+      }
+
       if (res.ok) {
-        const contentType = res.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          await res.json();
-          setMessage({ type: 'success', text: 'Notification preferences updated successfully!' });
-        } else {
-           setMessage({ type: 'success', text: 'Notification preferences updated successfully!' });
-        }
+        setMessage({ type: 'success', text: 'Notification preferences updated successfully!' });
       } else {
-        const contentType = res.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-           const errData = await res.json();
-           throw new Error(errData.error || 'Failed to save');
-        }
-        throw new Error('Failed to save');
+        throw new Error(data.error || 'Failed to save');
       }
     } catch (e: any) {
       setMessage({ type: 'error', text: e.message || 'Failed to update preferences. Please try again.' });
