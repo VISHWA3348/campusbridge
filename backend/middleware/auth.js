@@ -41,17 +41,14 @@ export const authenticate = async (req, res, next) => {
       role: user.role 
     };
     next();
-  } catch (err) {
-    console.error('JWT Verification / DB Failed:', err.message, '| Secret length:', getSecret().length);
-    if (err.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expired - please login again', code: 'TOKEN_EXPIRED' });
-    }
-    if (err.name === 'JsonWebTokenError') {
-      return res.status(401).json({ error: 'Invalid token', details: err.message, code: 'INVALID_TOKEN' });
-    }
-    // Generic errors (like database timeouts during cold-start) should return 500, not 401
-    // This prevents the frontend from falsely assuming the token is invalid and logging out
-    res.status(500).json({ error: 'Internal server error during authentication', details: err.message });
+  } catch (error) {
+    console.error("JWT Verification / DB Failed:", error);
+
+    return res.status(401).json({
+      success: false,
+      message: "Authentication failed",
+      details: error.message
+    });
   }
 };
 

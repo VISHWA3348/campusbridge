@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function runTests() {
   console.log('🚀 STARTING DUMMY USER E2E TEST\n');
-  
+
   let tokens = {};
   let userIds = {};
   let alumniProfileIds = {};
@@ -27,7 +27,7 @@ async function runTests() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: u.email, password: '123456' })
       }).then(r => r.json());
-      
+
       if (resp.token) {
         tokens[u.email] = resp.token;
         userIds[u.email] = resp.user.id;

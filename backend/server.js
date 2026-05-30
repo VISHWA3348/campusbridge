@@ -182,6 +182,29 @@ app.get('/api/global/search', authenticate, async (req, res) => {
   res.json({ users, jobs });
 });
 
+app.get('/api/colleges', async (req, res) => {
+  try {
+    const colleges = await prisma.college.findMany({
+      where: { status: 'active' },
+      select: {
+        id: true,
+        name: true,
+        collegeCode: true
+      }
+    });
+    const mapped = colleges.map(c => ({
+      _id: c.id.toString(),
+      id: c.id,
+      name: c.name,
+      code: c.collegeCode
+    }));
+    res.json(mapped);
+  } catch (error) {
+    console.error('Fetch public colleges error:', error);
+    res.status(500).json({ error: 'Failed to fetch colleges' });
+  }
+});
+
 app.get('/', (req, res) => {
   res.json({ message: 'CampusBridge API is running' });
 });

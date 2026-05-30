@@ -1,9 +1,8 @@
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
 const { authenticateUser } = require('../middleware/auth');
 
 const router = express.Router();
-const prisma = new PrismaClient();
+import prisma from '../prisma/db.js';
 
 // --- Global Search ---
 router.get('/search', authenticateUser, async (req, res) => {

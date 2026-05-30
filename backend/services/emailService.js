@@ -3,18 +3,58 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 10000,   // 10 seconds
-  socketTimeout: 10000      // 10 seconds
-});
+const createTransporter = (port, secure) => {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: port,
+    secure: secure,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,   // 10 seconds
+    socketTimeout: 10000      // 10 seconds
+  });
+};
+
+const sendMailWithFallback = async (mailOptions) => {
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const configuredPort = parseInt(process.env.SMTP_PORT);
+  const isSecure = process.env.SMTP_SECURE === 'true';
+
+  if (configuredPort) {
+    try {
+      const transporter = createTransporter(configuredPort, isSecure);
+      return await transporter.sendMail(mailOptions);
+    } catch (err) {
+      console.error(`Configured SMTP port ${configuredPort} failed, trying fallbacks...`, err.message);
+    }
+  }
+
+  // Try Port 587 (TLS)
+  try {
+    const transporter = createTransporter(587, false);
+    return await transporter.sendMail(mailOptions);
+  } catch (err587) {
+    console.warn('SMTP Port 587 (TLS) failed, trying Port 465 (SSL)... Error:', err587.message);
+    // Try Port 465 (SSL)
+    try {
+      const transporter = createTransporter(465, true);
+      return await transporter.sendMail(mailOptions);
+    } catch (err465) {
+      console.warn('SMTP Port 465 (SSL) failed, trying Port 2525... Error:', err465.message);
+      // Try Port 2525
+      try {
+        const transporter = createTransporter(2525, false);
+        return await transporter.sendMail(mailOptions);
+      } catch (err2525) {
+        console.error('All SMTP transport fallbacks failed.');
+        throw err2525;
+      }
+    }
+  }
+};
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://campusbridge.zinoingroup.in';
 
@@ -43,7 +83,7 @@ export const sendVerificationEmail = async (email, token) => {
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+  await sendMailWithFallback(mailOptions);
 };
 
 export const sendOTPEmail = async (email, otp) => {
@@ -78,7 +118,7 @@ export const sendOTPEmail = async (email, otp) => {
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+  await sendMailWithFallback(mailOptions);
 };
 
 export const sendNotificationEmail = async (email, { title, message, link }) => {
@@ -107,7 +147,7 @@ export const sendNotificationEmail = async (email, { title, message, link }) => 
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await sendMailWithFallback(mailOptions);
   } catch (error) {
     console.error('Email sending failed:', error);
   }
@@ -145,7 +185,7 @@ export const sendPasswordResetEmail = async (email, otp) => {
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+  await sendMailWithFallback(mailOptions);
 };
 
 export const sendWelcomeEmail = async (email, { name, role, collegeName }) => {
@@ -199,7 +239,7 @@ export const sendWelcomeEmail = async (email, { name, role, collegeName }) => {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await sendMailWithFallback(mailOptions);
   } catch (error) {
     console.error('Welcome email sending failed:', error);
   }

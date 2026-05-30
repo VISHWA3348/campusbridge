@@ -2,26 +2,57 @@
 
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import { BarChart, Users, Building2, TrendingUp, PieChart, Loader2, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { fetchAdminStats } from '@/lib/api';
+import { BarChart, Users, Building2, TrendingUp, PieChart, Loader2, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function AnalyticsPage() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchAdminStats();
+      setStats(data);
+    } catch (err: any) {
+      console.error('Error fetching analytics:', err);
+      setError(err.message || 'Failed to load analytics overview.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetch((process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api') + '/admin/analytics/overview', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    })
-    .then(res => res.json())
-    .then(data => {
-      setStats(data);
-      setLoading(false);
-    });
+    loadData();
   }, []);
 
   if (loading) return (
     <DashboardLayout>
       <div className="flex justify-center py-20"><Loader2 className="w-10 h-10 animate-spin text-indigo-600" /></div>
+    </DashboardLayout>
+  );
+
+  if (error) return (
+    <DashboardLayout>
+      <div className="mb-10">
+        <h1 className="text-4xl font-black tracking-tight mb-2 uppercase">Global Platform Analytics</h1>
+        <p className="text-slate-500 font-medium">Monitoring growth and engagement across all institutions.</p>
+      </div>
+      <div className="bg-red-50 border border-red-100 p-8 rounded-[2rem] text-center max-w-xl mx-auto my-10 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <AlertCircle className="w-8 h-8" />
+        </div>
+        <h3 className="text-lg font-black text-red-800 mb-2">Failed to Load Analytics</h3>
+        <p className="text-red-600/80 text-sm font-medium mb-6">{error}</p>
+        <button 
+          onClick={loadData}
+          className="px-6 py-3 bg-red-600 hover:bg-red-750 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-red-200 active:scale-95 cursor-pointer"
+        >
+          Try Again
+        </button>
+      </div>
     </DashboardLayout>
   );
 

@@ -49,6 +49,68 @@ router.use(authorizeRole('SUPER_ADMIN'));
 
 router.get('/analytics/overview', getSuperAdminAnalytics);
 
+router.get('/analytics/global', async (req, res) => {
+  try {
+    const [
+      userCounts,
+      totalColleges,
+      resumeStats,
+      mentorshipXPStats,
+      placementCount,
+      activeChats,
+      webinarParticipants,
+      mentorshipRequests
+    ] = await Promise.all([
+      prisma.user.groupBy({
+        by: ['role'],
+        _count: { id: true }
+      }),
+      prisma.college.count(),
+      prisma.resumeAnalysis.count(),
+      prisma.alumni.aggregate({
+        _sum: { mentorshipXP: true }
+      }),
+      prisma.placement.count(),
+      prisma.message.count(),
+      prisma.registration.count(),
+      prisma.mentorshipRequest.count()
+    ]);
+
+    const studentsCount = userCounts.find(u => u.role === 'STUDENT')?._count.id || 0;
+    const alumniCount = userCounts.find(u => u.role === 'ALUMNI')?._count.id || 0;
+    const collegeAdmins = userCounts.find(u => u.role === 'COLLEGE_ADMIN')?._count.id || 0;
+    const superAdmins = userCounts.find(u => u.role === 'SUPER_ADMIN')?._count.id || 0;
+    const totalUsers = studentsCount + alumniCount + collegeAdmins + superAdmins;
+
+    const students = await prisma.student.findMany({
+      select: { readinessScore: true }
+    });
+
+    const globalAvgReadiness = students.length > 0
+      ? students.reduce((acc, s) => acc + (s.readinessScore || 0), 0) / students.length
+      : 0;
+
+    res.json({
+      success: true,
+      totalUsers,
+      students: studentsCount,
+      alumni: alumniCount,
+      admins: collegeAdmins + superAdmins,
+      totalColleges,
+      globalReadiness: Math.round(globalAvgReadiness),
+      resumeAnalyses: resumeStats,
+      mentorshipXP: mentorshipXPStats._sum.mentorshipXP || 0,
+      activeChats,
+      webinarParticipants,
+      mentorshipRequests,
+      placementsReported: placementCount
+    });
+  } catch (error) {
+    console.error('Fetch global analytics error:', error);
+    res.status(500).json({ error: 'Failed to fetch global analytics' });
+  }
+});
+
 // --- College Management ---
 router.get('/colleges', getColleges);
 router.get('/colleges/:id', getCollegeById);
@@ -100,7 +162,7 @@ router.get('/users', async (req, res) => {
       ];
     }
 
-    const [users, total] = await Promise.all([
+    const [users, total, totalUsers, students, alumni, admins] = await Promise.all([
       prisma.user.findMany({ 
         where,
         include: { 
@@ -112,10 +174,24 @@ router.get('/users', async (req, res) => {
         take: parseInt(limit),
         orderBy: { createdAt: 'desc' }
       }),
-      prisma.user.count({ where })
+      prisma.user.count({ where }),
+      prisma.user.count(),
+      prisma.user.count({ where: { role: 'STUDENT' } }),
+      prisma.user.count({ where: { role: 'ALUMNI' } }),
+      prisma.user.count({ where: { role: { in: ['COLLEGE_ADMIN', 'SUPER_ADMIN'] } } })
     ]);
     
-    res.json({ users, total, page: parseInt(page), limit: parseInt(limit) });
+    res.json({ 
+      success: true,
+      totalUsers,
+      students,
+      alumni,
+      admins,
+      users, 
+      total, 
+      page: parseInt(page), 
+      limit: parseInt(limit) 
+    });
   } catch (error) {
     console.error('Get users error:', error);
     res.status(500).json({ error: 'Failed to fetch users' });
@@ -373,6 +449,77 @@ router.get('/placements/stats', async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch global placement stats' });
+  }
+});
+
+// --- Admin Announcements / Broadcast Hub ---
+router.get('/announcements', async (req, res) => {
+  try {
+    const announcements = await prisma.announcement.findMany({
+      include: {
+        college: true,
+        _count: { select: { views: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const totalBroadcasts = announcements.length;
+    const engagementViews = await prisma.announcementView.count();
+
+    res.json({
+      success: true,
+      totalBroadcasts,
+      engagementViews,
+      announcements
+    });
+  } catch (error) {
+    console.error('Fetch admin announcements error:', error);
+    res.status(500).json({ error: 'Failed to fetch announcements' });
+  }
+});
+
+router.post('/announcements', async (req, res) => {
+  try {
+    const { title, description, priority, targetRole, targetDept, targetYear, attachment, isPinned, collegeId } = req.body;
+    const finalCollegeId = collegeId ? parseInt(collegeId) : req.user.collegeId;
+
+    const announcement = await prisma.announcement.create({
+      data: {
+        collegeId: finalCollegeId,
+        title,
+        description,
+        priority: priority || 'low',
+        targetRole: targetRole || 'ALL',
+        targetDept,
+        targetYear,
+        attachment,
+        isPinned: isPinned || false
+      }
+    });
+
+    // Notify targeted users
+    const users = await prisma.user.findMany({
+      where: {
+        collegeId: finalCollegeId,
+        role: targetRole === 'ALL' ? { in: ['STUDENT', 'ALUMNI'] } : targetRole,
+      }
+    });
+
+    for (const u of users) {
+      await createNotification(req, {
+        userId: u.id,
+        type: 'ANNOUNCEMENT',
+        title: 'New Announcement',
+        message: `A new announcement has been posted: ${title}`,
+        priority: priority === 'high' ? 'URGENT' : (priority === 'medium' ? 'IMPORTANT' : 'NORMAL'),
+        link: '/dashboard/announcements'
+      });
+    }
+
+    res.json({ success: true, announcement });
+  } catch (error) {
+    console.error('Create admin announcement error:', error);
+    res.status(500).json({ error: 'Failed to create announcement' });
   }
 });
 

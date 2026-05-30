@@ -1,5 +1,6 @@
 import prisma from '../prisma/db.js';
 import { createNotification } from '../utils/notification.js';
+import { sendNotificationEmail } from '../services/emailService.js';
 
 export const getCollegeAnnouncements = async (req, res) => {
   const collegeId = req.user.collegeId;
@@ -38,7 +39,7 @@ export const createAnnouncement = async (req, res) => {
       }
     });
 
-    // Create notifications for targeted users
+    // Create notifications and send email alerts for targeted users
     const users = await prisma.user.findMany({
       where: {
         collegeId,
@@ -55,6 +56,12 @@ export const createAnnouncement = async (req, res) => {
         priority: priority === 'high' ? 'URGENT' : (priority === 'medium' ? 'IMPORTANT' : 'NORMAL'),
         link: '/dashboard/announcements'
       });
+
+      sendNotificationEmail(u.email, {
+        title: `New Announcement: ${title}`,
+        message: description,
+        link: '/dashboard/announcements'
+      }).catch(err => console.error(`[ANNOUNCEMENT EMAIL FAILED] To: ${u.email} | Error:`, err.message));
     });
 
     res.json(announcement);

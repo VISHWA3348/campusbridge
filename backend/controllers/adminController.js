@@ -14,7 +14,12 @@ export const getSuperAdminAnalytics = async (req, res) => {
       mentorshipStats,
       placementStats,
       globalConnectivity,
-      webinarRegistrations
+      webinarRegistrations,
+      activeUsers,
+      activeCodes,
+      usedCodesSum,
+      totalCodes,
+      verificationCounts
     ] = await Promise.all([
       prisma.user.groupBy({
         by: ['role'],
@@ -37,7 +42,15 @@ export const getSuperAdminAnalytics = async (req, res) => {
       }),
       prisma.placement.count(),
       prisma.message.count(),
-      prisma.registration.count()
+      prisma.registration.count(),
+      prisma.user.count({ where: { isVerified: true } }),
+      prisma.signupCode.count({ where: { status: 'ACTIVE' } }),
+      prisma.signupCode.aggregate({ _sum: { usedCount: true } }),
+      prisma.signupCode.count(),
+      prisma.user.groupBy({
+        by: ['verificationStatus'],
+        _count: { id: true }
+      })
     ]);
 
     // Role-based counts
@@ -152,23 +165,17 @@ export const getSuperAdminAnalytics = async (req, res) => {
         return ud.getMonth() === monthIndex && ud.getFullYear() === year;
       }).length;
 
-      // Cumulative users for the graph if needed, or just monthly signups
-      // The frontend seems to expect a count that might be cumulative or absolute
-      // Let's use monthly signups for 'users' and average readiness for 'readiness'
-      
-      const monthReadiness = students.filter(s => {
-        // This is tricky because readinessScore is current, not historical.
-        // For a real trend, we'd need a history table.
-        // But we can approximate or use the average of students who joined that month.
-        return true; // Simplified for now
-      });
-
       growthTrends.push({
         month: monthName,
         users: count,
         readiness: Math.floor(globalAvgReadiness) // Use current global avg as a baseline
       });
     }
+
+    const verificationStats = (verificationCounts || []).map(vc => ({
+      status: vc.verificationStatus,
+      count: vc._count.id
+    }));
 
     res.json({
       totalUsers,
@@ -187,6 +194,13 @@ export const getSuperAdminAnalytics = async (req, res) => {
       globalAvgReadiness,
       liveFeed,
       growthTrends,
+      activeUsers,
+      inviteStats: {
+        active: activeCodes,
+        used: usedCodesSum._sum.usedCount || 0,
+        total: totalCodes
+      },
+      verificationStats,
       connectivity: {
         totalMessages: globalConnectivity,
         webinarParticipation: webinarRegistrations,

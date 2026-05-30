@@ -54,6 +54,9 @@ export default function UsersManagementPage() {
     name: '', email: '', role: 'STUDENT', collegeId: '', department: '', rollNumber: '', phoneNumber: '', company: '', passoutYear: ''
   });
   const [saving, setSaving] = useState(false);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [students, setStudents] = useState(0);
+  const [alumni, setAlumni] = useState(0);
 
   useEffect(() => {
     loadData();
@@ -69,6 +72,15 @@ export default function UsersManagementPage() {
       // Handle both paginated {users: [], total} and plain array responses
       const usersList = Array.isArray(usersData) ? usersData : (usersData?.users || []);
       setUsers(usersList);
+      if (usersData && !Array.isArray(usersData)) {
+        setTotalUsers(usersData.totalUsers || 0);
+        setStudents(usersData.students || 0);
+        setAlumni(usersData.alumni || 0);
+      } else {
+        setTotalUsers(usersList.length);
+        setStudents(usersList.filter((u: any) => u.role === 'STUDENT').length);
+        setAlumni(usersList.filter((u: any) => u.role === 'ALUMNI').length);
+      }
       const collegesList = Array.isArray(collegesData) ? collegesData : (collegesData?.colleges || []);
       setColleges(collegesList);
     } catch (err) {
@@ -127,10 +139,10 @@ export default function UsersManagementPage() {
   });
 
   const stats = [
-    { label: 'Total Users', value: users.length, icon: <Users />, color: 'blue' },
+    { label: 'Total Users', value: totalUsers, icon: <Users />, color: 'blue' },
     { label: 'Verified', value: users.filter(u => u.isVerified).length, icon: <ShieldCheck />, color: 'green' },
-    { label: 'Students', value: users.filter(u => u.role === 'STUDENT').length, icon: <GraduationCap />, color: 'purple' },
-    { label: 'Alumni', value: users.filter(u => u.role === 'ALUMNI').length, icon: <Briefcase />, color: 'amber' },
+    { label: 'Students', value: students, icon: <GraduationCap />, color: 'purple' },
+    { label: 'Alumni', value: alumni, icon: <Briefcase />, color: 'amber' },
   ];
 
   return (

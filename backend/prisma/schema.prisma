@@ -140,6 +140,7 @@ model User {
   @@index([role])
   @@index([collegeId])
   @@index([verificationStatus])
+  @@index([createdAt])
 }
 
 model VerificationToken {

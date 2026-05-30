@@ -584,6 +584,11 @@ export async function fetchAdminOverview() {
   return handleResponse(res, `${API_BASE_URL}/admin/analytics/overview`);
 }
 
+export async function fetchGlobalAnalytics() {
+  const res = await fetch(`${API_BASE_URL}/admin/analytics/global`, { headers: getHeaders() });
+  return handleResponse(res, `${API_BASE_URL}/admin/analytics/global`);
+}
+
 export async function fetchAdminPlacements() {
   const res = await fetch(`${API_BASE_URL}/admin/placements`, { headers: getHeaders() });
   return handleResponse(res, `${API_BASE_URL}/admin/placements`);

@@ -1,9 +1,8 @@
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
 const { authenticateUser, authorizeRole } = require('../middleware/auth');
 
 const router = express.Router();
-const prisma = new PrismaClient();
+import prisma from '../prisma/db.js';
 
 const adminOnly = [authenticateUser, authorizeRole('SUPER_ADMIN')];
 

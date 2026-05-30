@@ -1,9 +1,8 @@
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
 const { authenticateUser, authorizeRole } = require('../middleware/auth');
 
 const router = express.Router();
-const prisma = new PrismaClient();
+import prisma from '../prisma/db.js';
 
 // College Admin: Get College Stats
 router.get('/college', authenticateUser, authorizeRole('COLLEGE_ADMIN'), async (req, res) => {

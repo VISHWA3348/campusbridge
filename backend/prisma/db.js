@@ -1,12 +1,22 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient({
+const globalForPrisma = global;
+
+const prisma = globalForPrisma.prisma || new PrismaClient({
   datasources: {
     db: {
       url: process.env.DATABASE_URL,
     },
   },
-  log: ['error'],
+  log: ['error', 'warn'],
+});
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}
+
+process.on("beforeExit", async () => {
+   await prisma.$disconnect();
 });
 
 // Auto-reconnect on connection drop (important for Render + Supabase)

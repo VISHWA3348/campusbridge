@@ -2,11 +2,10 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const { PrismaClient } = require('@prisma/client');
 const { sendVerificationEmail } = require('../services/emailService');
 
 const router = express.Router();
-const prisma = new PrismaClient();
+import prisma from '../prisma/db.js';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 // --- Signup with Email Verification ---

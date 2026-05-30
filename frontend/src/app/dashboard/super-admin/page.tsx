@@ -35,27 +35,62 @@ export default function SuperAdminDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [features, setFeatures] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const statsData = await fetchAdminStats();
+      setStats(statsData);
+      
+      const token = localStorage.getItem('token');
+      const featRes = await fetch((process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api') + '/admin/features', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const featData = await featRes.json();
+      setFeatures(Array.isArray(featData) ? featData : []);
+    } catch (err: any) {
+      console.error('Super Admin Dashboard load error:', err);
+      setError(err.message || 'Failed to load ecosystem dashboard data.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const statsData = await fetchAdminStats();
-        setStats(statsData);
-        
-        const token = localStorage.getItem('token');
-        const featRes = await fetch((process.env.NEXT_PUBLIC_API_URL ? (process.env.NEXT_PUBLIC_API_URL.endsWith('/api') ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL + '/api') : 'https://campusbridge-e4cv.onrender.com/api') + '/admin/features', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const featData = await featRes.json();
-        setFeatures(Array.isArray(featData) ? featData : []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadData();
   }, []);
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex justify-center items-center py-40">
+          <div className="w-10 h-10 border-4 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="max-w-xl mx-auto my-20 p-10 bg-white rounded-[2.5rem] border border-slate-100 shadow-xl text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Activity className="w-8 h-8" />
+          </div>
+          <h2 className="text-2xl font-black text-slate-950 mb-3">Unable to Load Dashboard</h2>
+          <p className="text-slate-500 font-medium text-sm mb-8">{error}</p>
+          <button 
+            onClick={loadData}
+            className="bg-slate-900 hover:bg-slate-800 text-white font-black text-sm px-8 py-4 rounded-2xl transition-all cursor-pointer active:scale-95 shadow-lg"
+          >
+            Retry Loading
+          </button>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const cards = [
     { label: 'Total Colleges', value: stats?.totalColleges || 0, icon: <Building2 />, color: 'blue', href: '/dashboard/super-admin/colleges' },
